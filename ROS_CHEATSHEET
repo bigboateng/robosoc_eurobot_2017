@@ -1,0 +1,3 @@
+rospack = ros + pack(age)
+roscd = ros + cd
+rosls = ros + ls
