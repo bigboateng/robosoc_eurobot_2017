@@ -1,2 +1,2 @@
-PythonAStar/.idea/
-.DS_Store
+*PythonAStar/.idea/
+*.DS_Store
