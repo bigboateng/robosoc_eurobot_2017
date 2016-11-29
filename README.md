@@ -12,5 +12,5 @@ If you've never used Git or Github, Git is a software some body wrote that helps
 * Fork this repository by clicking on the fork button above. This will give you your own copy of the repository that you can experiment/add code to.
 * Open git-bash in a folder of your choice where you want to keep the code. On windows you can right click in any folder and 'Git Bash here'. On Mac/Linux you need to use cd and ls commands to navigate to the folder you want. Once in that folder, do
 ```sh
-$ git clone https://github.com/your_git_username/robosoc_eurobot_2017.git
+$ git clone https://github.com/bigboateng/robosoc_eurobot_2017.git
 ```
