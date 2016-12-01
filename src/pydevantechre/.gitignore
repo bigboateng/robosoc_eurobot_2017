@@ -1,0 +1,5 @@
+# emacs backupfiles
+**/*~
+# python bytecomplied source
+**/*.pyc
+**/*.pyo
