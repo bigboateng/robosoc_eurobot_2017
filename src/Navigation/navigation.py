@@ -27,15 +27,23 @@ def printIMUDiagnosticData():
 def startNavigationSystem(hertz=1):  # start taking readings at 10 hz (default)
 	pitch, yaw, roll = 0.0
 	pitch_dot, yaw_dot, roll_dot = 0.0
+
+	# initialize the imu sensor
+	initializeSensor()
+	# create the ros node
+	rospy.init_node("navigation",anonymous=True)
+	rate = rospy.Rate(hertz)
 	while not rospy.is_shutdown():
+		 # Read the Euler angles for heading, roll, pitch (all in degrees).
+    	heading, roll, pitch = bno.read_euler()
 		sys, gyro, accel, mag = bno.get_calibration_status()
 	    # Print everything out.
 	    print('Heading={0:0.2F} Roll={1:0.2F} Pitch={2:0.2F}\tSys_cal={3} Gyro_cal={4} Accel_cal={5} Mag_cal={6}'.format(
 	          heading, roll, pitch, sys, gyro, accel, mag))
-		rate.sleep(hertz)
+		rate.sleep()
 
 if __name__ == "__main__":
 	try:
-		startNavigationSystem(20)
+		startNavigationSystem(1)
 	except rospy.ROSInterruptExecption:
 		pass
