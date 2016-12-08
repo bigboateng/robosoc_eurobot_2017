@@ -1,0 +1,23 @@
+TODO file for pyDevantechRE
+===========================
+
+(The following list is not in any particular order)
+
+Packaging
+---------
+
+* Write proper setup script for setuptools.
+* Add needed files to build deb (and possible other formats) package.
+
+Documentation
+-------------
+
+* Document properly (currently using numpy style docstring) and setup sphinx to create documentation.
+
+Core functionality
+------------------
+
+* Complete currently implemented devices' classes.
+* Add more devices.
+* Include more 'connection' drivers targeted to other platforms.
+* Implement warnings and other logging messages.
