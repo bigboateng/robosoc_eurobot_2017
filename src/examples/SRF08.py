@@ -66,7 +66,7 @@ class SRF08 :
 
   # Private Fields
   range_mm = 11008 # Range in mm (min 43mm, max 11008mm)
-  mode = 2# 1: INCHES / 2: CENTIMETERS / 3: MICROSECONDS 
+  mode = 2 # 1: INCHES / 2: CENTIMETERS / 3: MICROSECONDS 
   echo = [i for i in range(17)]
 
   # Constructor
@@ -93,7 +93,7 @@ class SRF08 :
 		time.sleep(self.range_mm * 0.065/11008)
 		i = 0
 		while i < 17:
-			self.echo[i] = self.i2c.readU8(self.SRF08_ECHO_1_LSB+i) + (self.i2c.readU8(self.SRF08_ECHO_1_MSB+i) * 255)
+			self.echo[i] = self.i2c.readU8(self.SRF08_ECHO_1_LSB + (2*i)) + 255*(self.i2c.readU8(self.SRF08_ECHO_1_MSB + (2*i)) * 255)
 			i += 1
 	elif (self.mode == 2):
 		self.i2c.write8(self.SRF08_COMMAND, self.SRF08_RANGING_MODE_RESULT_CENTIMETERS)
@@ -101,14 +101,18 @@ class SRF08 :
 		time.sleep(0.1)
 		i = 0 
 		while i < 17:
-			self.echo[i] = self.i2c.readU8(self.SRF08_ECHO_1_LSB+i) + (self.i2c.readU8(self.SRF08_ECHO_1_MSB+i) * 255)
+			self.echo[i] = self.i2c.readU8(self.SRF08_ECHO_1_LSB + (2*i)) + 255*(self.i2c.readU8(self.SRF08_ECHO_1_MSB + (2*i)) * 255)
+			#print str(self.i2c.readU8(self.SRF08_ECHO_1_MSB + (2*i)))
+			#print str(self.i2c.readU8(self.SRF08_ECHO_1_LSB + (2*i)))
+			print str(self.echo[i])
 			i += 1
+			time.sleep(0.01)
 	elif (self.mode == 3):
 		self.i2c.write8(self.SRF08_COMMAND, self.SRF08_RANGING_MODE_RESULT_MICROSECONDS)
 		time.sleep(self.range_mm * 0.065/11008)
 		i = 0 
 		while i < 17:
-			self.echo[i] = self.i2c.readU8(self.SRF08_ECHO_1_LSB+i) + (self.i2c.readU8(self.SRF08_ECHO_1_MSB+i) * 255)
+			self.echo[i] = self.i2c.readU8(self.SRF08_ECHO_1_LSB+i) + 255*(self.i2c.readU8(self.SRF08_ECHO_1_MSB+i) * 255)
 			i += 1
 	else:
 		i = 0 
