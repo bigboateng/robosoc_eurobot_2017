@@ -65,16 +65,16 @@ class SRF08 :
   SRF08_CHANGE_I2C_ADDRESS_3 = 0xAA
 
   # Private Fields
-  range_mm # Range in mm (min 43mm, max 11008mm)
-  mode # 1: INCHES / 2: CENTIMETERS / 3: MICROSECONDS 
-  echo[17]
+  range_mm = 11008 # Range in mm (min 43mm, max 11008mm)
+  mode = 2# 1: INCHES / 2: CENTIMETERS / 3: MICROSECONDS 
+  echo = [i for i in range(17)]
 
   # Constructor
   def __init__(self, address=0xE0, mode=2, debug=False):
-    self.i2c = Adafruit_I2C(address)
+	self.i2c = Adafruit_I2C(address)
 
-    self.address = address
-    self.debug = debug # Make sure the specified mode is in the appropriate range 
+	self.address = address
+	self.debug = debug # Make sure the specified mode is in the appropriate range 
     
 	self.mode = mode
 	self.range_mm = 11008
@@ -83,36 +83,37 @@ class SRF08 :
 #  def writeRange_mm(self, range)
 #	self.i2c.write8(self.SRF08_RANGE, ((range-43)/43) )
 	
-  def setMode(self, mode)
+  def setMode(self, mode=2):
 	self.mode = mode
 	
-  def readEcho(seft) #, echo=1)
-	if (self.mode = 1)
-		self.i2c.write8(SRF08_COMMAND, SRF08_RANGING_MODE_RESULT_INCHES)
+  def readEcho(self): 
+#, echo=1)
+	if (self.mode == 1):
+		self.i2c.write8(self.SRF08_COMMAND, self.SRF08_RANGING_MODE_RESULT_INCHES)
 		time.sleep(self.range_mm * 0.065/11008)
 		i = 0
-		while i < 17
-			echo[i] = self.i2c.readU8(self.SRF08_ECHO_1_LSB+i) + (self.i2c.readU8(self.SRF08_ECHO_1_MSB+i) * 255)
-			i++;
-	else if (self.mode = 2)
-		self.i2c.write8(SRF08_COMMAND, SRF08_RANGING_MODE_RESULT_CENTIMETERS)
+		while i < 17:
+			self.echo[i] = self.i2c.readU8(self.SRF08_ECHO_1_LSB+i) + (self.i2c.readU8(self.SRF08_ECHO_1_MSB+i) * 255)
+			i += 1
+	elif (self.mode == 2):
+		self.i2c.write8(self.SRF08_COMMAND, self.SRF08_RANGING_MODE_RESULT_CENTIMETERS)
 		time.sleep(self.range_mm * 0.065/11008)
 		i = 0 
-		while i < 17
-			echo[i] = self.i2c.readU8(self.SRF08_ECHO_1_LSB+i) + (self.i2c.readU8(self.SRF08_ECHO_1_MSB+i) * 255)
-			i++
-	else if (self.mode = 3)
-		self.i2c.write8(SRF08_COMMAND, SRF08_RANGING_MODE_RESULT_MICROSECONDS)
+		while i < 17:
+			self.echo[i] = self.i2c.readU8(self.SRF08_ECHO_1_LSB+i) + (self.i2c.readU8(self.SRF08_ECHO_1_MSB+i) * 255)
+			i += 1
+	elif (self.mode == 3):
+		self.i2c.write8(self.SRF08_COMMAND, self.SRF08_RANGING_MODE_RESULT_MICROSECONDS)
 		time.sleep(self.range_mm * 0.065/11008)
 		i = 0 
-		while i < 17
-			echo[i] = self.i2c.readU8(self.SRF08_ECHO_1_LSB+i) + (self.i2c.readU8(self.SRF08_ECHO_1_MSB+i) * 255)
-			i++
-	else
+		while i < 17:
+			self.echo[i] = self.i2c.readU8(self.SRF08_ECHO_1_LSB+i) + (self.i2c.readU8(self.SRF08_ECHO_1_MSB+i) * 255)
+			i += 1
+	else:
 		i = 0 
-		while i < 17
-			echo[i] = 0
-			i++;
+		while i < 17:
+			self.echo[i] = 0
+			i += 1
 			
 		print "Undefined mode number"
 			
