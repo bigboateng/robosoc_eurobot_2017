@@ -97,14 +97,11 @@ class SRF08 :
 			i += 1
 	elif (self.mode == 2):
 		self.i2c.write8(self.SRF08_COMMAND, self.SRF08_RANGING_MODE_RESULT_CENTIMETERS)
-		#time.sleep(self.range_mm * 0.065/11008)
-		time.sleep(0.1)
+		time.sleep(0.01 + self.range_mm * 0.065/11008)
+		#time.sleep(0.1)
 		i = 0 
 		while i < 17:
 			self.echo[i] = self.i2c.readU8(self.SRF08_ECHO_1_LSB + (2*i)) + 255*(self.i2c.readU8(self.SRF08_ECHO_1_MSB + (2*i)) * 255)
-			#print str(self.i2c.readU8(self.SRF08_ECHO_1_MSB + (2*i)))
-			#print str(self.i2c.readU8(self.SRF08_ECHO_1_LSB + (2*i)))
-			print str(self.echo[i])
 			i += 1
 			time.sleep(0.01)
 	elif (self.mode == 3):
