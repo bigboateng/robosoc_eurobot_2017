@@ -72,8 +72,8 @@ class MD25 :
       self.mode = self.__MD25_STANDARD
     else:
       self.mode = mode
-    self.showBatteryVoltage()
-    self.readData()
+    self.readBatteryVoltage()
+    #self.readData()
 
   def forward(self, speed=255):
     self.i2c.write8(self.__MD25_SPEED_1, speed)
@@ -101,4 +101,25 @@ class MD25 :
       "Displays the calibration values for debugging purposes"
       print "DBG: ENC_1A = %6d" % (self._enc_1a)
 
+  def readBatteryVoltage(self):
+      "Reads the battery voltage from md25"
+      self._battery_voltage = self.i2c.readS8(6)
+      print "Voltage = %s" %str(self._battery_voltage/10.0)
+	
+  def resetEncoders(self):
+    "Resets the encoder values"
+    self.i2c.write8(self.__MD25_COMMAND, self.__MD25_RESET_ENCODER_REGISTERS)
+
+  def readEncoder(self, type=1):
+      "Reads the encoder 1 value"
+      if type == 1:
+        base_reg = 2
+      else:
+        base_reg = 6
+      b3 = self.i2c.readS8(base_reg)
+      b2 = self.i2c.readU8(base_reg+1)
+      b1 = self.i2c.readU8(base_reg+2)
+      b0 = self.i2c.readU8(base_reg+3)
+      encoder = (b3 << 24) + (b2 << 16) + (b1 << 8) + b0	
+      return encoder*0.09
   

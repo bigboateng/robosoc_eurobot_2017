@@ -2,7 +2,7 @@ from MD25 import MD25
 import tty, time, termios, fcntl, sys, os
 
 controller = MD25(0x58,1,True)
-
+controller.resetEncoders()
 class _GetchUnix:
   def __init__(self):
     import tty, sys
@@ -34,4 +34,6 @@ while k != 'x':
     controller.stop()
   time.sleep(0.1)
   controller.stop()
-
+  one = controller.readEncoder(type=1)
+  two = controller.readEncoder(type=2)
+  print("Encoder 1 = {}, Encoder 2 = {}".format(one, two))	
