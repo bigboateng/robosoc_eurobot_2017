@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import rospy
 from std_msgs.msg import String
-from MotorControl.MD25 import MD25 
+from MD25 import MD25 
 controller = MD25(0x58,1,True)
 
 def update_ukf():
@@ -10,7 +10,7 @@ def update_ukf():
 	# init node
 	rospy.init_node("nav_node", anonymous=True)
 	# update every 1 second
-	rate = rospy.Rate(1)
+	rate = rospy.Rate(10)
 	# odom publisher
 	odom_publisher = rospy.Publisher("odometry_publisher", String, queue_size=10)
 	count = 0
