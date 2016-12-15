@@ -8,8 +8,13 @@ from SRF08 import SRF08
 
 # Initialise the SRF08
 UltraSonic_sensor = SRF08(0x70, 2, False)
-while 1 :
-	UltraSonic_sensor.readEcho();
+while 1:
+	UltraSonic_sensor.readEcho(1)
+	print "Echo1 : %d" % (UltraSonic_sensor.echo[0])
+ 
+'''
+while 1:
+	UltraSonic_sensor.readEcho()
 	print "Echo1 : %d" % (UltraSonic_sensor.echo[0])
 	print "Echo2 : %d" % (UltraSonic_sensor.echo[1])
 	print "Echo3 : %d" % (UltraSonic_sensor.echo[2])
@@ -27,3 +32,5 @@ while 1 :
 	print "Echo15 : %d" % (UltraSonic_sensor.echo[14])
 	print "Echo16 : %d" % (UltraSonic_sensor.echo[15])
 	print "Echo17 : %d" % (UltraSonic_sensor.echo[16])
+	print "------------------------------------------"
+'''

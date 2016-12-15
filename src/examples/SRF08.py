@@ -78,7 +78,7 @@ class SRF08 :
     
 	self.mode = mode
 	self.range_mm = 11008
-	self.i2c.write8(self.SRF08_RANGE, ((self.range_mm-43)/43) )
+	self.i2c.write8(self.SRF08_RANGE, ((self.range_mm-43)/43)) # If range_mm != 11008, you should change the default gain of the sensor
 	
 #  def writeRange_mm(self, range)
 #	self.i2c.write8(self.SRF08_RANGE, ((range-43)/43) )
@@ -86,36 +86,62 @@ class SRF08 :
   def setMode(self, mode=2):
 	self.mode = mode
 	
-  def readEcho(self): 
-#, echo=1)
-	if (self.mode == 1):
-		self.i2c.write8(self.SRF08_COMMAND, self.SRF08_RANGING_MODE_RESULT_INCHES)
-		time.sleep(self.range_mm * 0.065/11008)
+  def readEcho(self, echo_num=0):
+	if (echo_num == 0):
+		if (self.mode == 1):
+			self.i2c.write8(self.SRF08_COMMAND, self.SRF08_RANGING_MODE_RESULT_INCHES)
+			time.sleep(0.005 + self.range_mm * 0.065/11008)
+			i = 0
+			while i < 17:
+				self.echo[i] = self.i2c.readU8(self.SRF08_ECHO_1_LSB + (2*i)) + 255*(self.i2c.readU8(self.SRF08_ECHO_1_MSB + (2*i)) * 255)
+				i += 1
+		elif (self.mode == 2):
+			self.i2c.write8(self.SRF08_COMMAND, self.SRF08_RANGING_MODE_RESULT_CENTIMETERS)
+			#while (self.i2c.readU8(self.SRF08_SOFTWARE_VERSION) == 255):
+			time.sleep(0.005 + self.range_mm * 0.065/11008)
+			i = 0 
+			while i < 17:
+				self.echo[i] = self.i2c.readU8(self.SRF08_ECHO_1_LSB + (2*i)) + 255*(self.i2c.readU8(self.SRF08_ECHO_1_MSB + (2*i)) * 255)
+				i += 1
+		elif (self.mode == 3):
+			self.i2c.write8(self.SRF08_COMMAND, self.SRF08_RANGING_MODE_RESULT_MICROSECONDS)
+			time.sleep(0.005 + self.range_mm * 0.065/11008)
+			i = 0 
+			while i < 17:
+				self.echo[i] = self.i2c.readU8(self.SRF08_ECHO_1_LSB+i) + 255*(self.i2c.readU8(self.SRF08_ECHO_1_MSB+i) * 255)
+				i += 1
+		else:
+			i = 0 
+			while i < 17:
+				self.echo[i] = 0
+				i += 1
+			
+			print "Undefined mode number"
+			
+	elif (echo_num >= 1 & echo_num <= 17): 
+		if (self.mode == 1):
+			self.i2c.write8(self.SRF08_COMMAND, self.SRF08_RANGING_MODE_RESULT_INCHES)
+			time.sleep(0.005 + self.range_mm * 0.065/11008)
+			self.echo[echo_num-1] = self.i2c.readU8(self.SRF08_ECHO_1_LSB + (2*(echo_num-1))) + 255*(self.i2c.readU8(self.SRF08_ECHO_1_MSB + (2*(echo_num-1))))
+		elif (self.mode == 2):
+			self.i2c.write8(self.SRF08_COMMAND, self.SRF08_RANGING_MODE_RESULT_CENTIMETERS)
+                        time.sleep(0.005 + self.range_mm * 0.065/11008)
+                        self.echo[echo_num-1] = self.i2c.readU8(self.SRF08_ECHO_1_LSB + (2*(echo_num-1))) + 255*(self.i2c.readU8(self.SRF08_ECHO_1_MSB + (2*(echo_num-1))))
+		elif (self.mode == 3):
+                        self.i2c.write8(self.SRF08_COMMAND, self.SRF08_RANGING_MODE_RESULT_MICROSECONDS)
+                        time.sleep(0.005 + self.range_mm * 0.065/11008)
+                        self.echo[echo_num-1] = self.i2c.readU8(self.SRF08_ECHO_1_LSB + (2*(echo_num-1))) + 255*(self.i2c.readU8(self.SRF08_ECHO_1_MSB + (2*(echo_num-1))))
+		else:
+			i = 0
+                        while i < 17:
+                                self.echo[i] = 0
+                                i += 1
+
+                        print "Undefined mode number"
+	else: 
 		i = 0
-		while i < 17:
-			self.echo[i] = self.i2c.readU8(self.SRF08_ECHO_1_LSB + (2*i)) + 255*(self.i2c.readU8(self.SRF08_ECHO_1_MSB + (2*i)) * 255)
-			i += 1
-	elif (self.mode == 2):
-		self.i2c.write8(self.SRF08_COMMAND, self.SRF08_RANGING_MODE_RESULT_CENTIMETERS)
-		time.sleep(0.01 + self.range_mm * 0.065/11008)
-		#time.sleep(0.1)
-		i = 0 
-		while i < 17:
-			self.echo[i] = self.i2c.readU8(self.SRF08_ECHO_1_LSB + (2*i)) + 255*(self.i2c.readU8(self.SRF08_ECHO_1_MSB + (2*i)) * 255)
-			i += 1
-			time.sleep(0.01)
-	elif (self.mode == 3):
-		self.i2c.write8(self.SRF08_COMMAND, self.SRF08_RANGING_MODE_RESULT_MICROSECONDS)
-		time.sleep(self.range_mm * 0.065/11008)
-		i = 0 
-		while i < 17:
-			self.echo[i] = self.i2c.readU8(self.SRF08_ECHO_1_LSB+i) + 255*(self.i2c.readU8(self.SRF08_ECHO_1_MSB+i) * 255)
-			i += 1
-	else:
-		i = 0 
 		while i < 17:
 			self.echo[i] = 0
 			i += 1
-			
-		print "Undefined mode number"
-			
+
+		print "Undefined echo number"
