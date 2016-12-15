@@ -121,5 +121,17 @@ class MD25 :
       b1 = self.i2c.readU8(base_reg+2)
       b0 = self.i2c.readU8(base_reg+3)
       encoder = (b3 << 24) + (b2 << 16) + (b1 << 8) + b0	
-      return encoder*0.09
+      return encoder*0.09 
+
+  def getEncoderValues():
+    "Returns the both encoder values"
+    encoder1 = readEncoder(1)
+    encoder2 = readEncoder(2)
+    return encoder1, encoder2
+
+
+
+
+
+
   
