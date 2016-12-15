@@ -59,7 +59,12 @@ class MD25 :
   _motor_2_current = 0
   _software_revision = 0
 
+  leftWheel_oldEncoder = 0
+  rightWheel_oldEncoder = 0
 
+  DIAMETER_OF_WHEELS = 10
+  RATIO_WHEELTICKS_TO_CM = 0.09
+  
   # Constructor
   def __init__(self, address=0x58, mode=1, debug=False):
     self.i2c = Adafruit_I2C(address)
@@ -74,6 +79,9 @@ class MD25 :
       self.mode = mode
     self.readBatteryVoltage()
     #self.readData()
+
+    leftWheel_oldEncoder = self.readEncoder(type=1)
+    rightWheel_oldEncoder = self.readEncoder(type=2)
 
   def forward(self, speed=255):
     self.i2c.write8(self.__MD25_SPEED_1, speed)
@@ -111,7 +119,7 @@ class MD25 :
     self.i2c.write8(self.__MD25_COMMAND, self.__MD25_RESET_ENCODER_REGISTERS)
 
   def readEncoder(self, type=1):
-      "Reads the encoder 1 value"
+      "Reads the encoder 1 value in terms of ticks"
       if type == 1:
         base_reg = 2
       else:
@@ -121,17 +129,27 @@ class MD25 :
       b1 = self.i2c.readU8(base_reg+2)
       b0 = self.i2c.readU8(base_reg+3)
       encoder = (b3 << 24) + (b2 << 16) + (b1 << 8) + b0	
-      return encoder*0.09 
+      return encoder#*0.09 
 
   def getEncoderValues(self):
     "Returns the both encoder values"
-    encoder1 = self.readEncoder(type=1)
-    encoder2 = self.readEncoder(type=2)
+    leftWheel_newEncoder = self.readEncoder(type = 1)
+    rightWhel_newEncoder = self.readEncoder(type = 2)
+
+    leftWheel_distanceMoved = (leftWheel_newEncoder - leftWheel_oldEncoder) * RATIO_WHEELTICKS_TO_CM
+    rightWheel_distanceMoved = (rightWhel_newEncoder - rightWheel_oldEncoder) * RATIO_WHEELTICKS_TO_CM
+
+    leftWheel_oldEncoder = leftWheel_newEncoder
+    rightWheel_oldEncoder = rightWhel_newEncoder
+
+    distanceMoved = (leftWheel_distanceMoved + rightWheel_distanceMoved) / 2
+    angleMoved = (leftWheel_distanceMoved - rightWheel_distanceMoved) / DIAMETER_OF_WHEELS
+
+    if angleMoved > 3.14
+      angleMoved -= 2*3.14
+    if angleMoved < -3.14
+      angleMoved += 2*3.14
+
+    return distanceMoved*sin(angleMoved), distanceMoved*cos(angleMoved), angleMoved
+
     return encoder1, encoder2
-
-
-
-
-
-
-  
