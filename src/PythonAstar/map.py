@@ -11,7 +11,7 @@ class Map(object):
     def __init__(self, graph, nodes, width, height):
         self.graph = graph  # static representation of the map
         self.nodes = nodes
-        self.colour = 0  # blue by default
+        self.colour = 0  # blue side by default
         self.width = width
         self.height = height
         self.dynamic_objects = {"robot": nodes[0][0]}  # stores the position of anything that moves on the map

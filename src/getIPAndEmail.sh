@@ -9,18 +9,19 @@
 
 info=$(ifconfig)
 
-if [[ $info != *"wlan0"* ]] ; then
+if [[ $info != *"wlan"* ]] ; then
+	echo "no network connection"
 	exit 1
 fi
 
 ### Will sleep for 10 seconds in order to get the ip address from the router
-ip=$(ifconfig wlan0 | sed -En 's/127.0.0.1//;s/.*inet (addr:)?(([0-9]*\.){3}[0-9]*).*/\2/p') 
+ip=$(hostname -I) 
 
 count=20
 
 while [ -z "$ip" ] ; do
 	sleep 1
-	ip=$(ifconfig wlan0 | sed -En 's/127.0.0.1//;s/.*inet (addr:)?(([0-9]*\.){3}[0-9]*).*/\2/p') 
+	ip=$(ifconfig | sed -En 's/127.0.0.1//;s/.*inet (addr:)?(([0-9]*\.){3}[0-9]*).*/\2/p') 
 	count=$((count - 1))
 	if [[ $count -lt 0 ]] ; then
 		echo "Unable to get the IP addess"
@@ -28,8 +29,10 @@ while [ -z "$ip" ] ; do
 	fi
 done
 
+echo "sending email"
+
 if [[ $# -eq 1 ]] ; then
-	ifconfig wlan0 | sed -En 's/127.0.0.1//;s/.*inet (addr:)?(([0-9]*\.){3}[0-9]*).*/\2/p' | mailx -s "test" $1
+	ifconfig | sed -En 's/127.0.0.1//;s/.*inet (addr:)?(([0-9]*\.){3}[0-9]*).*/\2/p' | mailx -s "test" $1
 else
 	echo $ip | mailx -s "test" "mateusz.ochal8@outlook.com"
 fi

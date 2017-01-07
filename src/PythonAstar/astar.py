@@ -9,8 +9,8 @@ class AStar(object):
         return sqrt((end.x - node.x)**2 + (end.y - node.y)**2)
         
     def search(self, start, end):
-        discovered = set()
-        visited = set()
+        discovered = set()  # openset - nodes that have been 'noticed'
+        visited = set()  # closedset - nodes that have been 'noticed' and 'expanded'
         current = start
         discovered.add(current)
 
