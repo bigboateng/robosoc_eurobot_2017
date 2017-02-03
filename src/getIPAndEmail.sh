@@ -21,7 +21,7 @@ count=20
 
 while [ -z "$ip" ] ; do
         sleep 1
-        ip=$(ifconfig | sed -En 's/127.0.0.1//;s/.*inet (addr:)?(([0-9]*\.){3}[0-9]*).*/\2/p')
+        ip=$(ifconfig wlan0 | sed -En 's/127.0.0.1//;s/.*inet (addr:)?(([0-9]*\.){3}[0-9]*).*/\2/p')
         count=$((count - 1))
         if [[ $count -lt 0 ]] ; then
                 echo "Unable to get the IP addess"
