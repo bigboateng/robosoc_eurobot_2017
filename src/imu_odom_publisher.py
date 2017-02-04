@@ -3,6 +3,7 @@ import rospy
 from std_msgs.msg import String
 from nav_msgs.msg import Odometry
 from sensor_msgs.msg import Imu
+import tf2
 
 # import BN005 library and non-ros stuff
 from Adafruit_BNO055 import BNO055
@@ -18,7 +19,10 @@ bno = BNO055.BNO055(rst=7)
 default_refresh_rate = 5
 log_data = False
 
-
+# Global robot position
+robot_pos_x = 0
+robot_pos_y = 0
+robot_theta = 0
 
 def toRadsPerSec(val):
 	return val * 0.0174533
@@ -81,6 +85,9 @@ def run_main_program():
 		imu.linear_acceleration.y = accel_y
 		imu.linear_acceleration.z = accel_z
 		imu_publisher.publish(imu)
+
+		# Create odometry object
+		
 		if log_data:
 			print("Heading={0:0.2F}, Roll={1:0.02F}, Pitch={2:0.2F}".format(heading, roll, pitch))	
 		print("I am working")
