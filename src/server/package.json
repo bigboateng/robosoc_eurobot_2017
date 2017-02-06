@@ -1,0 +1,13 @@
+{
+  "name": "ip_server",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node server"
+  },
+  "dependencies": {
+    "firebase": "^3.6.8",
+    "ip-monitor": "^0.1.2",
+    "nodemailer": "^3.0.2"
+  }
+}
