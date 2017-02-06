@@ -6,6 +6,7 @@
     "start": "node server"
   },
   "dependencies": {
+    "address": "^1.0.1",
     "firebase": "^3.6.8",
     "ip-monitor": "^0.1.2",
     "nodemailer": "^3.0.2"
