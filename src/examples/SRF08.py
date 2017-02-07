@@ -1,7 +1,8 @@
 #!/usr/bin/python
 
 import time
-from Adafruit_I2C import Adafruit_I2C
+#from I2C import I2C
+import Adafruit_GPIO.I2C as I2C
 
 # ===========================================================================
 # SRF08 Class
@@ -71,7 +72,7 @@ class SRF08 :
 
   # Constructor
   def __init__(self, address=0xE0, mode=2, debug=False):
-	self.i2c = Adafruit_I2C(address)
+	self.i2c = I2C.Device(address, 1)
 
 	self.address = address
 	self.debug = debug # Make sure the specified mode is in the appropriate range 
@@ -124,13 +125,21 @@ class SRF08 :
 			time.sleep(0.005 + self.range_mm * 0.065/11008)
 			self.echo[echo_num-1] = self.i2c.readU8(self.SRF08_ECHO_1_LSB + (2*(echo_num-1))) + 255*(self.i2c.readU8(self.SRF08_ECHO_1_MSB + (2*(echo_num-1))))
 		elif (self.mode == 2):
-			self.i2c.write8(self.SRF08_COMMAND, self.SRF08_RANGING_MODE_RESULT_CENTIMETERS)
-                        time.sleep(0.005 + self.range_mm * 0.065/11008)
-                        self.echo[echo_num-1] = self.i2c.readU8(self.SRF08_ECHO_1_LSB + (2*(echo_num-1))) + 255*(self.i2c.readU8(self.SRF08_ECHO_1_MSB + (2*(echo_num-1))))
+			flag = 1
+			while flag :
+				flag = 0
+				try :
+					self.i2c.write8(self.SRF08_COMMAND, self.SRF08_RANGING_MODE_RESULT_CENTIMETERS)
+					time.sleep(0.002 + self.range_mm * 0.065/11008)
+					self.echo[echo_num-1] = self.i2c.readU8(self.SRF08_ECHO_1_LSB + (2*(echo_num-1))) + 255*(self.i2c.readU8(self.SRF08_ECHO_1_MSB + (2*(echo_num-1))))
+				except IOError :
+					print "IOError"
+					flag = 1
 		elif (self.mode == 3):
                         self.i2c.write8(self.SRF08_COMMAND, self.SRF08_RANGING_MODE_RESULT_MICROSECONDS)
                         time.sleep(0.005 + self.range_mm * 0.065/11008)
                         self.echo[echo_num-1] = self.i2c.readU8(self.SRF08_ECHO_1_LSB + (2*(echo_num-1))) + 255*(self.i2c.readU8(self.SRF08_ECHO_1_MSB + (2*(echo_num-1))))
+
 		else:
 			i = 0
                         while i < 17:
