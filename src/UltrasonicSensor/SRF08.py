@@ -90,27 +90,48 @@ class SRF08 :
   def readEcho(self, echo_num=0):
 	if (echo_num == 0):
 		if (self.mode == 1):
-			self.i2c.write8(self.SRF08_COMMAND, self.SRF08_RANGING_MODE_RESULT_INCHES)
-			time.sleep(0.005 + self.range_mm * 0.065/11008)
-			i = 0
-			while i < 17:
-				self.echo[i] = self.i2c.readU8(self.SRF08_ECHO_1_LSB + (2*i)) + 255*(self.i2c.readU8(self.SRF08_ECHO_1_MSB + (2*i)) * 255)
-				i += 1
+			flag = 1
+			while flag :
+				flag = 0
+				try :
+					self.i2c.write8(self.SRF08_COMMAND, self.SRF08_RANGING_MODE_RESULT_INCHES)
+					time.sleep(0.005 + self.range_mm * 0.065/11008)
+					i = 0
+					while i < 17:
+						self.echo[i] = self.i2c.readU8(self.SRF08_ECHO_1_LSB + (2*i)) + 255*(self.i2c.readU8(self.SRF08_ECHO_1_MSB + (2*i)) * 255)
+						i += 1
+				except IOError :
+					print "IOError"
+					flag = 1
 		elif (self.mode == 2):
-			self.i2c.write8(self.SRF08_COMMAND, self.SRF08_RANGING_MODE_RESULT_CENTIMETERS)
-			#while (self.i2c.readU8(self.SRF08_SOFTWARE_VERSION) == 255):
-			time.sleep(0.005 + self.range_mm * 0.065/11008)
-			i = 0 
-			while i < 17:
-				self.echo[i] = self.i2c.readU8(self.SRF08_ECHO_1_LSB + (2*i)) + 255*(self.i2c.readU8(self.SRF08_ECHO_1_MSB + (2*i)) * 255)
-				i += 1
+			flag = 1
+			while flag :
+				flag = 0
+				try :
+					self.i2c.write8(self.SRF08_COMMAND, self.SRF08_RANGING_MODE_RESULT_CENTIMETERS)
+					#while (self.i2c.readU8(self.SRF08_SOFTWARE_VERSION) == 255):
+					time.sleep(0.005 + self.range_mm * 0.065/11008)
+					i = 0 
+					while i < 17:
+						self.echo[i] = self.i2c.readU8(self.SRF08_ECHO_1_LSB + (2*i)) + 255*(self.i2c.readU8(self.SRF08_ECHO_1_MSB + (2*i)) * 255)
+						i += 1
+				except IOError :
+					print "IOError"
+					flag = 1
 		elif (self.mode == 3):
-			self.i2c.write8(self.SRF08_COMMAND, self.SRF08_RANGING_MODE_RESULT_MICROSECONDS)
-			time.sleep(0.005 + self.range_mm * 0.065/11008)
-			i = 0 
-			while i < 17:
-				self.echo[i] = self.i2c.readU8(self.SRF08_ECHO_1_LSB+i) + 255*(self.i2c.readU8(self.SRF08_ECHO_1_MSB+i) * 255)
-				i += 1
+			flag = 1
+			while flag :
+				flag = 0
+				try :
+					self.i2c.write8(self.SRF08_COMMAND, self.SRF08_RANGING_MODE_RESULT_MICROSECONDS)
+					time.sleep(0.005 + self.range_mm * 0.065/11008)
+					i = 0 
+					while i < 17:
+						self.echo[i] = self.i2c.readU8(self.SRF08_ECHO_1_LSB+i) + 255*(self.i2c.readU8(self.SRF08_ECHO_1_MSB+i) * 255)
+						i += 1
+				except IOError :
+					print "IOError"
+					flag = 1
 		else:
 			i = 0 
 			while i < 17:
@@ -121,9 +142,16 @@ class SRF08 :
 			
 	elif (echo_num >= 1 & echo_num <= 17): 
 		if (self.mode == 1):
-			self.i2c.write8(self.SRF08_COMMAND, self.SRF08_RANGING_MODE_RESULT_INCHES)
-			time.sleep(0.005 + self.range_mm * 0.065/11008)
-			self.echo[echo_num-1] = self.i2c.readU8(self.SRF08_ECHO_1_LSB + (2*(echo_num-1))) + 255*(self.i2c.readU8(self.SRF08_ECHO_1_MSB + (2*(echo_num-1))))
+			flag = 1
+			while flag :
+				flag = 0
+				try :
+					self.i2c.write8(self.SRF08_COMMAND, self.SRF08_RANGING_MODE_RESULT_INCHES)
+					time.sleep(0.005 + self.range_mm * 0.065/11008)
+					self.echo[echo_num-1] = self.i2c.readU8(self.SRF08_ECHO_1_LSB + (2*(echo_num-1))) + 255*(self.i2c.readU8(self.SRF08_ECHO_1_MSB + (2*(echo_num-1))))
+				except IOError :
+					print "IOError"
+					flag = 1
 		elif (self.mode == 2):
 			flag = 1
 			while flag :
@@ -136,10 +164,16 @@ class SRF08 :
 					print "IOError"
 					flag = 1
 		elif (self.mode == 3):
-                        self.i2c.write8(self.SRF08_COMMAND, self.SRF08_RANGING_MODE_RESULT_MICROSECONDS)
-                        time.sleep(0.005 + self.range_mm * 0.065/11008)
-                        self.echo[echo_num-1] = self.i2c.readU8(self.SRF08_ECHO_1_LSB + (2*(echo_num-1))) + 255*(self.i2c.readU8(self.SRF08_ECHO_1_MSB + (2*(echo_num-1))))
-
+                        flag = 1
+			while flag :
+				flag = 0
+				try :
+					self.i2c.write8(self.SRF08_COMMAND, self.SRF08_RANGING_MODE_RESULT_MICROSECONDS)
+                        		time.sleep(0.005 + self.range_mm * 0.065/11008)
+                        		self.echo[echo_num-1] = self.i2c.readU8(self.SRF08_ECHO_1_LSB + (2*(echo_num-1))) + 255*(self.i2c.readU8(self.SRF08_ECHO_1_MSB + (2*(echo_num-1))))
+				except IOError :
+					print "IOError"
+					flag = 1
 		else:
 			i = 0
                         while i < 17:
