@@ -7,9 +7,20 @@ from SRF08 import SRF08
 # ===========================================================================
 
 # Initialise the SRF08
-UltraSonic_sensor = SRF08(0x70, 2, False)
+# Change the I2C address to match your module address
+address = 0xE0 # WARNING : if you use the address profided by i2cdetect,
+	       #	   address = [addr] << 1
+UltraSonic_sensor = SRF08(address >> 1, 2, False)
 i = 1
-#'''
+
+# Code to change the address of an SRF08 module
+if (0): # Put 1 to change address, 0 otherwise
+	new_address = 0xE0 # default : 0xE0
+	UltraSonic_sensor.changeAddress(new_address)
+	i = 0
+	print "Address changed for : %s" % (format(new_address, '#04x')) 
+
+''' 
 while i:
 	#i = 0
 	UltraSonic_sensor.readEcho(1)
@@ -17,7 +28,7 @@ while i:
  
 '''
 while i:
-	i = 0
+	#i = 0
 	UltraSonic_sensor.readEcho()
 	print "Echo1 : %d" % (UltraSonic_sensor.echo[0])
 	print "Echo2 : %d" % (UltraSonic_sensor.echo[1])
@@ -37,4 +48,4 @@ while i:
 	print "Echo16 : %d" % (UltraSonic_sensor.echo[15])
 	print "Echo17 : %d" % (UltraSonic_sensor.echo[16])
 	print "------------------------------------------"
-'''
+#'''

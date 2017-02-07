@@ -188,3 +188,9 @@ class SRF08 :
 			i += 1
 
 		print "Undefined echo number"
+
+  def changeAddress(self, new_address):
+	self.i2c.write8(self.SRF08_COMMAND, 0xA0)
+	self.i2c.write8(self.SRF08_COMMAND, 0xAA)
+	self.i2c.write8(self.SRF08_COMMAND, 0xA5)
+	self.i2c.write8(self.SRF08_COMMAND, new_address)
