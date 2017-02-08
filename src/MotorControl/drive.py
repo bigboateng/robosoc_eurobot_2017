@@ -25,7 +25,7 @@ while k != 'x':
   if k == 's':
     controller.forward(1)
   elif k == 'w':
-    controller.forward(190)
+    controller.forward(220)
   elif k == 'd':
     controller.turn(190,1)
   elif k == 'a':
