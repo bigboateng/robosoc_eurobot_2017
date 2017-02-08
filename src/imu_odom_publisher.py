@@ -3,7 +3,8 @@ import rospy
 from std_msgs.msg import String
 from nav_msgs.msg import Odometry
 from sensor_msgs.msg import Imu
-
+#import tf2
+import tf2_ros
 # import BN005 library and non-ros stuff
 from Adafruit_BNO055 import BNO055
 import math
@@ -15,7 +16,7 @@ last_time = None
 
 # Imu setup
 bno = BNO055.BNO055(rst=7)
-default_refresh_rate = 5
+default_refresh_rate = 10
 log_data = False
 
 
@@ -48,13 +49,20 @@ def init():
 	# Check Imu is connected
 	if not bno.begin():
 		raise RuntimeError("Failed to initalize IMU, is reset pin 7?")
-	
 	# Imu publisher (for robot_localization node)
-	imu_publisher = rospy.Publisher("Imu_publisher", Imu, queue_size=50)
+	imu_publisher = rospy.Publisher("imu/data", Imu, queue_size=50)
 	current_time = rospy.Time.now()
 	last_time = rospy.Time.now()
 	# Main loop
 	run_main_program()
+
+def testTf2():
+	global rate
+	rospy.init_node("test_tf2", anonymous=True)
+	rate = rospy.Rate(1)
+	while not rospy.is_shutdown():
+		print("Hello World")
+		rate.sleep()
 
 def run_main_program():
 	global rate, imu_publisher
@@ -83,13 +91,14 @@ def run_main_program():
 		imu_publisher.publish(imu)
 		if log_data:
 			print("Heading={0:0.2F}, Roll={1:0.02F}, Pitch={2:0.2F}".format(heading, roll, pitch))	
-		print("I am working")
+			print("I am working")
 
 		last_time = current_time
 		rate.sleep()
 
 if __name__ == "__main__":
 	try:
-		init()
+		#init()
+		testTf2()
 	except rospy.ROSInterruptException:
 		pass
