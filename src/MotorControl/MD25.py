@@ -31,7 +31,7 @@ class MD25 :
   __MD25_MOTOR_1_CURRENT = 11
   __MD25_MOTOR_2_CURRENT = 12
   __MD25_SOFTWARE_VERSION = 13
-  __MD25_ACCELERATION = 14
+  __MD25_ACCELERATION = 3
   __MD25_MODE = 15
   __MD25_COMMAND = 16
 
@@ -75,7 +75,7 @@ class MD25 :
     self.readBatteryVoltage()
     #self.readData()
 
-  def forward(self, speed=255):
+  def forward(self, speed=100):
     self.i2c.write8(self.__MD25_SPEED_1, speed)
     self.i2c.write8(self.__MD25_SPEED_2, speed)
 
@@ -83,7 +83,7 @@ class MD25 :
     self.i2c.write8(self.__MD25_SPEED_1, 128)
     self.i2c.write8(self.__MD25_SPEED_2, 128)
 
-  def turn(self, speed1=255, speed2=1):
+  def turn(self, speed1=10, speed2=1):
     self.i2c.write8(self.__MD25_SPEED_1, speed1)
     self.i2c.write8(self.__MD25_SPEED_2, speed2)
 

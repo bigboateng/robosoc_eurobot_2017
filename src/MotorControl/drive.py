@@ -23,9 +23,9 @@ k = ''
 while k != 'x':
   k = getch()
   if k == 's':
-    controller.forward(1)
+    controller.forward(100)
   elif k == 'w':
-    controller.forward(220)
+    controller.forward(100)
   elif k == 'd':
     controller.turn(190,1)
   elif k == 'a':
