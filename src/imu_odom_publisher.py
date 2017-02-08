@@ -11,6 +11,7 @@ import tf2_ros
 from Adafruit_BNO055 import BNO055
 # import motor library
 from MD25 import MD25
+from Robot import Robot
 import math
 # Global variables
 rate = None
@@ -24,11 +25,16 @@ bno = BNO055.BNO055(rst=7)
 default_refresh_rate = 10
 log_data = False
 
+# setup primary robot
+primary_robot = Robot(axle_length = 0.7, wheel_diameter=0.23)
+
 # md25 setup 
-motor_controller = MD25(address=0x58, mode=1, debug=True)
+motor_controller = MD25(address=0x58, mode=1, debug=True, robot=primary_robot)
 motor_controller.resetEncoders()
 # Tf2 odometry broadcaster 
 odom_transform_broadcaster = tf2_ros.TransformBroadCaster()
+
+
 
 def toRadsPerSec(val):
 	return val * 0.0174533
@@ -103,6 +109,9 @@ def run_main_program():
 		odom_trans.header.frame_id = "odom"
 		odom_trans.header.child_frame_id = "base_link"
 
+		# update the position
+		motor_controller.updatePosition()
+		
 		odom_trans.transform.translation.x = motor_controller.getXPosition()
 		odom_trans.transform.translation.y = motor_controller.getYPosition()
 		odom_trans.transform.translation.z = 0.0

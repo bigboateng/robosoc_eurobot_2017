@@ -66,7 +66,7 @@ class MD25 :
   _PULSES_PER_REVOLUTION = 360
 
   # Constructor
-  def __init__(self, address=0x58, mode=1, debug=False, robot):
+  def __init__(self, address=0x58, mode=1, debug=False, robot=None):
     self.i2c = Adafruit_I2C(address)
     self.address = address
     self.debug = debug # Make sure the specified mode is in the appropriate range 
