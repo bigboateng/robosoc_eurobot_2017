@@ -3,14 +3,19 @@ import rospy
 from std_msgs.msg import String
 from nav_msgs.msg import Odometry
 from sensor_msgs.msg import Imu
-#import tf2
+from geometry_msgs.msg import TransformStamped, Quaternion
+#import tf and tf2
+import tf
 import tf2_ros
 # import BN005 library and non-ros stuff
 from Adafruit_BNO055 import BNO055
+# import motor library
+from MD25 import MD25
 import math
 # Global variables
 rate = None
 imu_publisher = None
+odom_publisher = None
 current_time = None
 last_time = None
 
@@ -19,11 +24,14 @@ bno = BNO055.BNO055(rst=7)
 default_refresh_rate = 10
 log_data = False
 
-
+# md25 setup 
+motor_controller = MD25(address=0x58, mode=1, debug=True)
+motor_controller.resetEncoders()
+# Tf2 odometry broadcaster 
+odom_transform_broadcaster = tf2_ros.TransformBroadCaster()
 
 def toRadsPerSec(val):
 	return val * 0.0174533
-
 
 def convertAngularRatesToRadians(data):
 	# This function converts angular velocities/accelerations from degs/sec to rads/sec
@@ -51,22 +59,17 @@ def init():
 		raise RuntimeError("Failed to initalize IMU, is reset pin 7?")
 	# Imu publisher (for robot_localization node)
 	imu_publisher = rospy.Publisher("imu/data", Imu, queue_size=50)
+	odom_publisher = rospy.Publisher("odom/data", Odometry, queue_size=50)
 	current_time = rospy.Time.now()
 	last_time = rospy.Time.now()
 	# Main loop
 	run_main_program()
 
-def testTf2():
-	global rate
-	rospy.init_node("test_tf2", anonymous=True)
-	rate = rospy.Rate(1)
-	while not rospy.is_shutdown():
-		print("Hello World")
-		rate.sleep()
-
 def run_main_program():
 	global rate, imu_publisher
 	while not rospy.is_shutdown():
+		# set current time
+		current_time = rospy.Time.now()
 		# First read imu data
 		heading, roll, pitch = convertEurlerAnglesToRads(bno.read_euler())
  		# Quaternion data
@@ -89,16 +92,43 @@ def run_main_program():
 		imu.linear_acceleration.y = accel_y
 		imu.linear_acceleration.z = accel_z
 		imu_publisher.publish(imu)
+
 		if log_data:
 			print("Heading={0:0.2F}, Roll={1:0.02F}, Pitch={2:0.2F}".format(heading, roll, pitch))	
 			print("I am working")
+
+		# Generate odometry data for publishing over tf
+		odom_trans = TransformStamped()
+		odom_trans.header.stamp = current_time
+		odom_trans.header.frame_id = "odom"
+		odom_trans.header.child_frame_id = "base_link"
+
+		odom_trans.transform.translation.x = motor_controller.getXPosition()
+		odom_trans.transform.translation.y = motor_controller.getYPosition()
+		odom_trans.transform.translation.z = 0.0
+		q = tf.transformations.quaternion_from_euler(0,0, motor_controller.getTheta())
+		odom_trans.transform.rotation = q
+
+		# Send the transform
+		odom_transform_broadcaster.sendTransform(odom_trans)
+
+		# Next publish odometry info over ros to robot_localization
+		odom = Odometry()
+		odom.header.stamp = current_time
+		odom.header.frame_id = "odom"
+		odom.child_frame_id = "base_link"
+		
+		# set the position
+		odom.pose.pose.position.x = motor_controller.getXPosition()
+		odom.pose.pose.position.y = motor_controller.getYPosition()
+		odom.pose.pose.position.z = 0.0
+		odom_publisher.publish(odom)
 
 		last_time = current_time
 		rate.sleep()
 
 if __name__ == "__main__":
 	try:
-		#init()
-		testTf2()
+		init()
 	except rospy.ROSInterruptException:
 		pass
