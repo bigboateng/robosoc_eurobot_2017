@@ -116,7 +116,7 @@ def run_main_program():
 		odom = Odometry()
 		odom.header.stamp = current_time
 		odom.header.frame_id = "odom"
-		odom.child_frame_id = "base_link"
+		odom.header.child_frame_id = "base_link"
 		
 		# set the position
 		odom.pose.pose.position.x = motor_controller.getXPosition()
