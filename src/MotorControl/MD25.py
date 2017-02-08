@@ -2,11 +2,11 @@
 
 import time
 from Adafruit_I2C import Adafruit_I2C
-
+from Robot import Robot
+from math import cos, sin
 # ===========================================================================
 # MD25 Class
 # ===========================================================================
-
 class MD25 :
   i2c = None
 
@@ -59,11 +59,15 @@ class MD25 :
   _motor_2_current = 0
   _software_revision = 0
 
+  # Pi
+  PI = 3.14159
+
+  # wheels pulses per revolustion
+  _PULSES_PER_REVOLUTION = 360
 
   # Constructor
-  def __init__(self, address=0x58, mode=1, debug=False):
+  def __init__(self, address=0x58, mode=1, debug=False, robot=None):
     self.i2c = Adafruit_I2C(address)
-
     self.address = address
     self.debug = debug # Make sure the specified mode is in the appropriate range 
     if ((mode < 0) | (mode > 3)): 
@@ -72,8 +76,13 @@ class MD25 :
       self.mode = self.__MD25_STANDARD
     else:
       self.mode = mode
-    self.readBatteryVoltage()
+    #self.readBatteryVoltage()
     #self.readData()
+    self.robot = robot
+    self.pos_x = 0.0
+    self.pos_y = 0.0
+    self.theta = 0.0
+    self.mul_count = PI * robot.wheel_diameter / _PULSES_PER_REVOLUTION
 
   def forward(self, speed=100):
     self.i2c.write8(self.__MD25_SPEED_1, speed)
@@ -121,13 +130,52 @@ class MD25 :
       b1 = self.i2c.readU8(base_reg+2)
       b0 = self.i2c.readU8(base_reg+3)
       encoder = (b3 << 24) + (b2 << 16) + (b1 << 8) + b0	
-      return encoder*0.09 
+      return encoder
 
-  def getEncoderValues():
+  def getEncoderValues(self):
     "Returns the both encoder values"
     encoder1 = readEncoder(1)
     encoder2 = readEncoder(2)
     return encoder1, encoder2
+
+
+  def updatePosition(self):
+    # Updates x, y, theta 
+    left_ticks = self.readEncoder(1)
+    right_ticks = self.readEncoder(2)
+    dist_left = left_ticks * self.mul_count
+    dist_right = right_ticks * self.mul_count
+    cos_current = cos(self.theta)
+    sin_current = sin(self.theta)
+
+    if abs(left_ticks -right_ticks) < 1e-6: # basically going straight
+      # moving in a straight line
+      self.pos_x += dist_left * cos_current
+      self.pos_y += dist_left * sin_current
+    else:
+      # moving in an arc
+      expr1 = self.robot.axle_length * (dist_right + dist_left) / (2.0 * (dist_right - dist_left))
+      right_minus_left = dist_right - dist_left
+      self.pos_x += expr1 * (sin(right_minus_left / self.robot.axle_length + self.theta)-sin_current)
+      self.pos_y -= expr1 * (cos(right_minus_left/self.robot.axle_length + self.theta) - cos_current)
+    
+      # new orientation
+      self.theta += right_minus_left / self.robot.axle_length
+
+      # Keep in range of -Pi to +pi
+      while self.theta > PI:
+        self.theta -= (2.0*PI)
+      while self.theta < -PI:
+        self.theta += (2.0*PI)
+
+  def getXPosition(self):
+    return self.pos_x
+
+  def getYPosition(self):
+    return self.pos_y
+
+  def getTheta(self):
+    return self.theta
 
 
 
