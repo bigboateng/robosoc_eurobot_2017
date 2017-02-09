@@ -31,7 +31,7 @@ class MD25 :
   __MD25_MOTOR_1_CURRENT = 11
   __MD25_MOTOR_2_CURRENT = 12
   __MD25_SOFTWARE_VERSION = 13
-  __MD25_ACCELERATION = 3
+  __MD25_ACCELERATION = 14
   __MD25_MODE = 15
   __MD25_COMMAND = 16
 
@@ -78,11 +78,13 @@ class MD25 :
       self.mode = mode
     #self.readBatteryVoltage()
     #self.readData()
+    self.PI = 3.14159
     self.robot = robot
     self.pos_x = 0.0
     self.pos_y = 0.0
     self.theta = 0.0
-    self.mul_count = PI * robot.wheel_diameter / _PULSES_PER_REVOLUTION
+    self.PULSES_PER_REVOLUTION = 360
+    self.mul_count = self.PI * self.robot.wheel_diameter / self.PULSES_PER_REVOLUTION
 
   def forward(self, speed=100):
     self.i2c.write8(self.__MD25_SPEED_1, speed)
@@ -140,7 +142,8 @@ class MD25 :
 
 
   def updatePosition(self):
-    # Updates x, y, theta 
+    # Updates x, y, theta
+    PI = self.PI
     left_ticks = self.readEncoder(1)
     right_ticks = self.readEncoder(2)
     dist_left = left_ticks * self.mul_count
@@ -160,12 +163,12 @@ class MD25 :
       self.pos_y -= expr1 * (cos(right_minus_left/self.robot.axle_length + self.theta) - cos_current)
     
       # new orientation
-      self.theta += right_minus_left / self.robot.axle_length
+      self.theta = right_minus_left / self.robot.axle_length
 
       # Keep in range of -Pi to +pi
-      while self.theta > PI:
+      while self.theta > 2*PI:
         self.theta -= (2.0*PI)
-      while self.theta < -PI:
+      while self.theta < -2*PI:
         self.theta += (2.0*PI)
 
   def getXPosition(self):
