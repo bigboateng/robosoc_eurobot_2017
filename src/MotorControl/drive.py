@@ -41,4 +41,4 @@ while k != 'x':
   x = controller.getXPosition()*100
   y = controller.getYPosition()*100
   theta = controller.getTheta()
-  print("X = {}, Y = {}, Theta = {}".format(x, y, math.degrees(theta)))	
+  #print("X = {}, Y = {}, Theta = {}".format(x, y, math.degrees(theta)))	

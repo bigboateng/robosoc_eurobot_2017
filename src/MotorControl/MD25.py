@@ -82,7 +82,7 @@ class MD25 :
     self.robot = robot
     self.pos_x = 0.0
     self.pos_y = 0.0
-    self.theta = 0.0
+    self.theta = pi/2
     self.PULSES_PER_REVOLUTION = 360
     self.mul_count = self.PI * self.robot.wheel_diameter / self.PULSES_PER_REVOLUTION
 
@@ -143,24 +143,29 @@ class MD25 :
 
   def updatePosition(self):
     # Updates x, y, theta 
-      rightDelta = self.readEncoder(2)
-      leftDelta = self.readEncoder(1)
+      rightDelta = -self.readEncoder(2)*self.mul_count
+      leftDelta = -(self.readEncoder(1)*self.mul_count)
       if abs(leftDelta - rightDelta) < 1.0e-6:  # basically going straight
-      self.pos_x += leftDelta * cos(self.theta)
-      self.pos_y += rightDelta * sin(self.theta)
+        self.pos_x += leftDelta * cos(self.theta)
+        self.pos_y += rightDelta * sin(self.theta)
+	print("Going forward")
       else:
-      R = self.robot.axle_length * (leftDelta + rightDelta) / (2 * (rightDelta - leftDelta))
-      wd = (rightDelta - leftDelta) / (self.robot.axle_length/2)
+	print("Turn")
+        R = self.robot.axle_length * (leftDelta + rightDelta) / (2 * (rightDelta - leftDelta))
+        wd = (rightDelta - leftDelta) / (self.robot.axle_length/2)
 
-      self.pos_x += R * sin(wd + self.theta) - R * sin(self.theta)
-      self.pos_y -= R * cos(wd + self.theta) - R * cos(self.theta)
-      self.theta = self.boundAngle(self.theta + wd)
+        self.pos_x += R * sin(wd + self.theta) - R * sin(self.theta)
+        self.pos_y -= R * cos(wd + self.theta) - R * cos(self.theta)
+        self.theta = self.boundAngle(self.theta + wd)
+	print("Encoder L = {}, Encoder R = {}".format(self.readEncoder(1), self.readEncoder(2)))
+	print("X={}, Y={}, theta={}".format(self.pos_x, self.pos_y, self.theta))
 
-  def boundAngle(self):
-    while self.theta > pi:
-      self.theta -= 2*pi
-    while self.theta < -pi:
-      self.theta += 2*pi
+  def boundAngle(self, angle):
+    while angle > pi:
+      angle -= 2*pi
+    while angle < -pi:
+      angle += 2*pi
+    return angle
 
   def getXPosition(self):
     return self.pos_x
