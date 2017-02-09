@@ -84,6 +84,9 @@ class MD25 :
     self.theta = 0.0
     self.mul_count = PI * robot.wheel_diameter / _PULSES_PER_REVOLUTION
 
+    #setting acceleration to 1 -> min value
+    self.i2c.write8(self.__MD25_ACCELERATION, 1)
+
   def forward(self, speed=255):
     self.i2c.write8(self.__MD25_SPEED_1, speed)
     self.i2c.write8(self.__MD25_SPEED_2, speed)
