@@ -78,13 +78,15 @@ class MD25 :
       self.mode = mode
     #self.readBatteryVoltage()
     #self.readData()
+    self.PI = 3.14159
     self.robot = robot
     self.pos_x = 0.0
     self.pos_y = 0.0
     self.theta = 0.0
-    self.mul_count = PI * robot.wheel_diameter / _PULSES_PER_REVOLUTION
+    self.PULSES_PER_REVOLUTION = 360
+    self.mul_count = self.PI * self.robot.wheel_diameter / self.PULSES_PER_REVOLUTION
 
-  def forward(self, speed=255):
+  def forward(self, speed=100):
     self.i2c.write8(self.__MD25_SPEED_1, speed)
     self.i2c.write8(self.__MD25_SPEED_2, speed)
 
@@ -92,7 +94,7 @@ class MD25 :
     self.i2c.write8(self.__MD25_SPEED_1, 128)
     self.i2c.write8(self.__MD25_SPEED_2, 128)
 
-  def turn(self, speed1=255, speed2=1):
+  def turn(self, speed1=10, speed2=1):
     self.i2c.write8(self.__MD25_SPEED_1, speed1)
     self.i2c.write8(self.__MD25_SPEED_2, speed2)
 
@@ -140,6 +142,7 @@ class MD25 :
 
 
   def updatePosition(self):
+<<<<<<< HEAD
     # Updates x, y, theta 
       rightDelta = self.readEncoder(2)
       leftDelta = self.readEncoder(1)
@@ -160,6 +163,36 @@ class MD25 :
     while self.theta < -pi:
       self.theta += 2*pi
 
+=======
+    # Updates x, y, theta
+    PI = self.PI
+    left_ticks = self.readEncoder(1)
+    right_ticks = self.readEncoder(2)
+    dist_left = left_ticks * self.mul_count
+    dist_right = right_ticks * self.mul_count
+    cos_current = cos(self.theta)
+    sin_current = sin(self.theta)
+
+    if abs(left_ticks -right_ticks) < 1e-6: # basically going straight
+      # moving in a straight line
+      self.pos_x += dist_left * cos_current
+      self.pos_y += dist_left * sin_current
+    else:
+      # moving in an arc
+      expr1 = self.robot.axle_length * (dist_right + dist_left) / (2.0 * (dist_right - dist_left))
+      right_minus_left = dist_right - dist_left
+      self.pos_x += expr1 * (sin(right_minus_left / self.robot.axle_length + self.theta)-sin_current)
+      self.pos_y -= expr1 * (cos(right_minus_left/self.robot.axle_length + self.theta) - cos_current)
+    
+      # new orientation
+      self.theta = right_minus_left / self.robot.axle_length
+
+      # Keep in range of -Pi to +pi
+      while self.theta > 2*PI:
+        self.theta -= (2.0*PI)
+      while self.theta < -2*PI:
+        self.theta += (2.0*PI)
+>>>>>>> bd3f4931d651a50aee7aa9def338b8b15d4c8d58
 
   def getXPosition(self):
     return self.pos_x

@@ -4,7 +4,9 @@ class Robot:
 	def __init__(self, axle_length, wheel_diameter):
 		self.axle_length = axle_length
 		self.wheel_diameter = wheel_diameter
-	
+
+	def getWheelDiameter(self):
+		return self.wheel_diameter	
 
 class Position:
 	def __init__(self):

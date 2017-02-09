@@ -2,18 +2,30 @@
 
 from MD25 import MD25
 import time
-
+from Robot import Robot
 # ===========================================================================
 # Example Code
 # ===========================================================================
 
-# Initialise the MD25 and use STANDARD mode (default value)
-controller = MD25(0x58,1,True)
-#controller.forward()
-time.sleep(3)
-#controller.forward(1)
-#time.sleep(1.0)
+# Initialise the MD25 and use STANDARD mode (default value)controller.resetEncoders()
+robot = Robot(0.181, 0.1)
+controller = MD25(0x58,1,True,robot)
+controller.resetEncoders()
+controller.forward()
+time.sleep(1)
+controller.stop()
+controller.updatePosition()
+print("X = {}, Y = {}, Theta = {}".format(controller.getXPosition(), controller.getYPosition(), controller.getTheta()))
+#controller.turn()
+#time.sleep(1)
+#controller.stop()
+time.sleep(1)
+controller.forward()
+time.sleep(1.0)
+controller.stop()
 #controller.turn()
 #time.sleep(1.0)
 controller.stop()
-controller.readEncoder1()
+controller.updatePosition()
+print("X = {}, Y = {}, Theta = {}".format(controller.getXPosition(), controller.getYPosition(), controller.getTheta()))
+#controller.readEncoder1()
