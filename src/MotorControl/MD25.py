@@ -3,7 +3,7 @@
 import time
 from Adafruit_I2C import Adafruit_I2C
 from Robot import Robot
-from math import cos, sin
+from math import cos, sin, pi
 # ===========================================================================
 # MD25 Class
 # ===========================================================================
@@ -141,32 +141,25 @@ class MD25 :
 
   def updatePosition(self):
     # Updates x, y, theta 
-    left_ticks = self.readEncoder(1)
-    right_ticks = self.readEncoder(2)
-    dist_left = left_ticks * self.mul_count
-    dist_right = right_ticks * self.mul_count
-    cos_current = cos(self.theta)
-    sin_current = sin(self.theta)
+      rightDelta = self.readEncoder(2)
+      leftDelta = self.readEncoder(1)
+      if abs(leftDelta - rightDelta) < 1.0e-6:  # basically going straight
+      self.pos_x += leftDelta * cos(self.theta)
+      self.pos_y += rightDelta * sin(self.theta)
+      else:
+      R = self.robot.axle_length * (leftDelta + rightDelta) / (2 * (rightDelta - leftDelta))
+      wd = (rightDelta - leftDelta) / (self.robot.axle_length/2)
 
-    if abs(left_ticks -right_ticks) < 1e-6: # basically going straight
-      # moving in a straight line
-      self.pos_x += dist_left * cos_current
-      self.pos_y += dist_left * sin_current
-    else:
-      # moving in an arc
-      expr1 = self.robot.axle_length * (dist_right + dist_left) / (2.0 * (dist_right - dist_left))
-      right_minus_left = dist_right - dist_left
-      self.pos_x += expr1 * (sin(right_minus_left / self.robot.axle_length + self.theta)-sin_current)
-      self.pos_y -= expr1 * (cos(right_minus_left/self.robot.axle_length + self.theta) - cos_current)
-    
-      # new orientation
-      self.theta += right_minus_left / self.robot.axle_length
+      self.pos_x += R * sin(wd + self.theta) - R * sin(self.theta)
+      self.pos_y -= R * cos(wd + self.theta) - R * cos(self.theta)
+      self.theta = self.boundAngle(self.theta + wd)
 
-      # Keep in range of -Pi to +pi
-      while self.theta > PI:
-        self.theta -= (2.0*PI)
-      while self.theta < -PI:
-        self.theta += (2.0*PI)
+  def boundAngle(self):
+    while self.theta > pi:
+      self.theta -= 2*pi
+    while self.theta < -pi:
+      self.theta += 2*pi
+
 
   def getXPosition(self):
     return self.pos_x
