@@ -37,8 +37,8 @@ while k != 'x':
     controller.stop()
   time.sleep(0.1)
   controller.stop()
-  controller.updatePosition()
-  x = controller.getXPosition()*100
-  y = controller.getYPosition()*100
-  theta = controller.getTheta()
+  #controller.updatePosition()
+  #x = controller.getXPosition()*100
+  #y = controller.getYPosition()*100
+  #theta = controller.getTheta()
   #print("X = {}, Y = {}, Theta = {}".format(x, y, math.degrees(theta)))	
