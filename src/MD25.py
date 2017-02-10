@@ -152,16 +152,16 @@ class MD25 :
         self.pos_x += leftDelta * cos(self.theta)
         self.pos_y += rightDelta * sin(self.theta)
 	self.resetEncoders()
-	print("Straight")
+	#print("Straight")
       else:
-	print("Arc")
+	#print("Arc")
         R = self.robot.axle_length * (leftDelta + rightDelta) / (2 * (rightDelta - leftDelta))
         wd = (rightDelta - leftDelta) / (self.robot.axle_length/2)	
         self.pos_x += R * sin(wd + self.theta) - R * sin(self.theta)
         self.pos_y += R * cos(wd + self.theta) - R * cos(self.theta)
         self.theta = self.boundAngle(self.theta + wd)
-	print("Encoder L = {}, Encoder R = {}".format(self.readEncoder(1), self.readEncoder(2)))
-	print("X={}, Y={}, theta={}".format(self.pos_x, self.pos_y, self.theta))
+	#print("Encoder L = {}, Encoder R = {}".format(self.readEncoder(1), self.readEncoder(2)))
+	#print("X={}, Y={}, theta={}".format(self.pos_x, self.pos_y, self.theta))
 	self.resetEncoders()
 
   def boundAngle(self, angle):
