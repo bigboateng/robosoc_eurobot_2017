@@ -21,8 +21,8 @@ pwm = Adafruit_PCA9685.PCA9685()
 
 # Parameters adapted for SG-90 servo!
 # Configure min and max servo pulse lengths
-servo_min = 205 #-90 deg for SG-90 (1ms) # Min pulse length out of 4096
-servo_max = 410 #+90 deg for SG-90 (2ms) # Max pulse length out of 4096
+servo_min = 103 #-90 deg for SG-90 # Min pulse length out of 4096
+servo_max = 512 #+90 deg for SG-90 # Max pulse length out of 4096
 
 # Helper function to make setting a servo pulse width simpler.
 def set_servo_pulse(channel, pulse):
@@ -45,3 +45,5 @@ while True:
     time.sleep(1)
     pwm.set_pwm(0, 0, servo_max)
     time.sleep(1)
+    pwm.set_pwm(0, 0, 300)
+    time.sleep(2)
