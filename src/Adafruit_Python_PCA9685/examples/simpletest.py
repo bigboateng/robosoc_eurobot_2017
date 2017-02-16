@@ -19,9 +19,10 @@ pwm = Adafruit_PCA9685.PCA9685()
 # Alternatively specify a different address and/or bus:
 #pwm = Adafruit_PCA9685.PCA9685(address=0x41, busnum=2)
 
+# Parameters adapted for SG-90 servo!
 # Configure min and max servo pulse lengths
-servo_min = 150  # Min pulse length out of 4096
-servo_max = 600  # Max pulse length out of 4096
+servo_min = 205 #-90 deg for SG-90 (1ms) # Min pulse length out of 4096
+servo_max = 410 #+90 deg for SG-90 (2ms) # Max pulse length out of 4096
 
 # Helper function to make setting a servo pulse width simpler.
 def set_servo_pulse(channel, pulse):
@@ -35,7 +36,7 @@ def set_servo_pulse(channel, pulse):
     pwm.set_pwm(channel, 0, pulse)
 
 # Set frequency to 60hz, good for servos.
-pwm.set_pwm_freq(60)
+pwm.set_pwm_freq(50)
 
 print('Moving servo on channel 0, press Ctrl-C to quit...')
 while True:
