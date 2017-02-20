@@ -1,2 +1,2 @@
-tests
 Adafruit_GPIO
+tests
