@@ -4,10 +4,10 @@ import time
 from Servo import Servo
 
 # ===========================================================================
-# Example Code
+# Example code using an SG90 servo
 # ===========================================================================
 
-# Initialisation
+# Initialisation (for an SG90 servo)
 servo_SG90 = Servo(0x40, 50)
 servo_SG90.setPulseLengthCenter(1500)
 servo_SG90.setCoef(float(1000/90))
