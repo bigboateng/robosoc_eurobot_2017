@@ -8,8 +8,8 @@ def split(path, width, height):
     img_width = im.size[0]
     img_height = im.size[1]
 
-    small_w = int(img_width/width)
-    small_h = int(img_height/height)
+    small_w = int(img_width/(width+1))
+    small_h = int(img_height/(height+1))
 
     image_arr = [[Image.new('RGB', (small_w, small_h), "white") for x in range(width)] for y in range(height)]
     image_value = [[0.0 for x in range(width)] for y in range(height)]
@@ -42,10 +42,13 @@ def split(path, width, height):
     return image_value[i][i]
 """
 
-values = split(r"D:\University\Robosoc\Eurobot 2017\SecondaryMap.png", 30, 20)
+width = 30
+height = 20
 
-for y in range(20):
-    for x in range(30):
+values = split("SecondaryMap2.png", width, height)
+
+for y in range(width):
+    for x in range(height):
         print(0 if 295-values[y][x] < 50 else 1, end='')
     print()
 
