@@ -65,7 +65,7 @@ if __name__== "__main__":
     m = StateMachine()
     m.add_state("Start", start_transitions)
     m.add_state("drive_state", drive_state_transitions)
-    m.add_state("rotate_state", rotate_state_transitions
+    m.add_state("rotate_state", rotate_state_transitions)
     m.add_state("align_moonbase_state", align_moonbase_state_transitions)
     m.add_state("pick_up_block_state", pick_up_block_state_transitions)
     m.add_state("drop_block_state", drop_block_state_transitions)

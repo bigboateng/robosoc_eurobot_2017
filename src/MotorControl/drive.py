@@ -1,7 +1,10 @@
 from MD25 import MD25
 import tty, time, termios, fcntl, sys, os
+from Robot import Robot
+import math
 
-controller = MD25(0x58,1,True)
+secondary_robot = Robot(0.181, 0.1)
+controller = MD25(0x58,1,True,secondary_robot)
 controller.resetEncoders()
 class _GetchUnix:
   def __init__(self):
@@ -23,9 +26,9 @@ k = ''
 while k != 'x':
   k = getch()
   if k == 's':
-    controller.forward(1)
+    controller.forward(100)
   elif k == 'w':
-    controller.forward(220)
+    controller.forward(100)
   elif k == 'd':
     controller.turn(190,1)
   elif k == 'a':
@@ -34,6 +37,8 @@ while k != 'x':
     controller.stop()
   time.sleep(0.1)
   controller.stop()
-  one = controller.readEncoder(type=1)
-  two = controller.readEncoder(type=2)
-  print("Encoder 1 = {}, Encoder 2 = {}".format(one, two))	
+  #controller.updatePosition()
+  #x = controller.getXPosition()*100
+  #y = controller.getYPosition()*100
+  #theta = controller.getTheta()
+  #print("X = {}, Y = {}, Theta = {}".format(x, y, math.degrees(theta)))	
