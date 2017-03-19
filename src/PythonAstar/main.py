@@ -39,14 +39,35 @@ def make_walls(gridString, graph, nodes, width, height):
 
 gridString = """"""
 
-w = 300
-h = 200
+smallGridString = """000000000001000000100000000000
+000000000000000000000000000000
+000000000000000000000000000000
+111111100000000000000001111111
+000000000000000000000000000000
+000000000000000000000000000000
+100000000000000000000000000000
+110000000000000000000000000001
+110000000000000000000000000001
+110000000000000000000000000001
+110000000000000000000000000001
+100000000000000000000000000001
+000000000000001100000000000001
+100000000000001100000000000001
+000000000110001100011000000000
+000000000111001100111000000000
+000000000011101101110000000000
+000000000001111111100000000000
+000000000000111111000000000000
+000000000000010010000000000000"""
+
+w = 30
+h = 20
 
 graph, nodes = make_graph(w, h)
-make_walls(gridString, graph, nodes, w, h)
+make_walls(smallGridString, graph, nodes, w, h)
 my_map = Map(graph, nodes, w, h)
-path = my_map.get_path_to(nodes[180][70])
-img_gen = ImgGen(w*6, h*6, nodes)
+path = my_map.get_path_to(nodes[18][18])
+img_gen = ImgGen(nodes)
 
 if path is None:
     print('No path found')
@@ -54,80 +75,11 @@ else:
     """
     print('Path found:')
     for node in path:
-        print(node.x, ', ', node.y)
+    print(node.x, ', ', node.y)
     print('Generalised')
     """
     gen_path = my_map.generalise(path)
     for node in gen_path:
         print(node.x, ', ', node.y)
 
-    img_gen.draw_single(path, gen_path, w, h, 0, 1)
-
-
-input("")
-
-""" OLD A* algorithm
-class AStar(object):
-    def __init__(self, graph):
-        self.graph = graph
-
-    def heuristic(self, node, start, end):
-        raise NotImplementedError
-
-    def search(self, start, end):
-        openset = set()
-        closedset = set()
-        current = start
-        openset.add(current)
-        while openset:
-            current = min(openset, key=lambda o:o.g + o.h)
-            if current == end:
-                path = []
-                while current.parent:
-                    path.append(current)
-                    current = current.parent
-                path.append(current)
-                return path[::-1]
-            openset.remove(current)
-            closedset.add(current)
-            for node in self.graph[current]:
-                if node in closedset:
-                    continue
-                if node in openset:
-                    new_g = current.g + current.move_cost(node)
-                    if node.g > new_g:
-                        node.g = new_g
-                        node.parent = current
-                else:
-                    node.g = current.g + current.move_cost(node)
-                    node.h = self.heuristic(node, start, end)
-                    node.parent = current
-                    openset.add(node)
-        return None
-
-
-class AStarNode(object):
-    def __init__(self):
-        self.g = 0
-        self.h = 0
-        self.parent = None
-
-    def move_cost(self, other):
-        raise NotImplementedError
-
-class AStarGrid(AStar):
-    def heuristic(self, node, start, end):
-        return sqrt((end.x - node.x)**2 + (end.y - node.y)**2)
-
-
-class AStarGridNode(AStarNode):
-    def __init__(self, x, y):
-        self.x, self.y = x, y
-        super(AStarGridNode, self).__init__()
-
-    def move_cost(self, other):
-        diagonal = abs(self.x - other.x) == 1 and abs(self.y - other.y) == 1
-        return 14 if diagonal else 10 # forteen comes from 1.414 = sqrt(2) for diagonals
-
-"""
-
+    img_gen.draw(path, gen_path, w, h, 0, 1)

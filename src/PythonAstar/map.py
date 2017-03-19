@@ -1,47 +1,41 @@
 from astar import AStar
 from astar_node import AStarNode
 from math import sqrt
+import time
 
 """
 This class contains higher level representation of the map.
 It contains the obstacles as well as the locations of points of interest, e.g. location of cylinders, base, etc.
+It also provides a path finding algorithm
 """
 class Map(object):
 
-    def __init__(self, graph, nodes, width, height):
+    def __init__(self, graph, nodes):
         self.graph = graph  # static representation of the map
         self.nodes = nodes
-        self.colour = 0  # blue by default
-        self.width = width
-        self.height = height
-        self.dynamic_objects = {"robot": nodes[0][0]}  # stores the position of anything that moves on the map
+        self.width = len(nodes[0])
+        self.height = len(nodes)
+        self.obstacles = {}
 
-    #  number = 0 for blue and number = 1 for yellow
-    def set__side(self, bit):
-        self.colour = bit
-
-    def update_position(self, new_pos):
-        self.pri_robot_pos[self.colour] = new_pos
-
-    def get_path_to(self, location):
+    # turns a pair into an astar node
+    def get_node(self, location):
         if location is not AStarNode:
-            loc = self.nodes[location.y][location.x]
+            return self.nodes[location[1]][location[0]]
         else:
-            loc = location
+            return location
 
+    # returns a path in the form of points from source to destination
+    def get_path(self, source, destination):
+        s = get_node(source)
+        d = get_node(destination)
         astar = AStar(self.graph)
-        path = astar.search(self.dynamic_objects["robot"], loc)
+        path = astar.search(s, d)
         return path
 
-    def add_obstacle(self, location):
-        self.add_obstacle(location, 0)
-
-    def add_obstacle(self, location, radius):
-        if location is not AStarNode:
-            loc = self.nodes[location.y][location.x]
-        else:
-            loc = location
-
+    # add obstacles of set radius to the map, 
+    def add_obstacle(self, location, radius = 25):
+        loc = get_node(location)
+        self.obstacles[time.time()] = (location, radius)
         for i in range(loc.x-radius, loc.x+radius):
             for j in range(loc.y-radius, loc.y+radius):
                 if not (0 <= loc.x + i < self.width):
@@ -51,6 +45,28 @@ class Map(object):
                 if not (sqrt(i**2 + j**2) < radius):
                     continue
                 self.graph[self.node[j][i]] = []
+
+    # update obstacles, if they've been longer than 15 seconds on the map then remove them from the list
+    def update_obstacles(self):
+        now = time.time()
+        for timestamp in self.obstacles.keys():
+            if now - timestamp > 15:
+                self.remove_obstacle(timestamp)
+
+    def remove_obstacle(self, timestamp):
+        (loc, radius) = self.obstacles[timestamp]
+        for i in range(loc.x-radius, loc.x+radius):
+            for j in range(loc.y-radius, loc.y+radius):
+                for x, y in [(0, 1), (0, -1), (1, 0), (-1, 0)]:
+                    if not (0 <= x + i < self.width):
+                        continue
+                    if not (0 <= y + j < self.height):
+                        continue
+                    if not (sqrt(i**2 + j**2) < radius):
+                        continue
+                    if nodes[x+i][y+j] not in self.graph[self.nodes[j][i]]:
+                        self.graph[self.nodes[j][i]].append(self.nodes[x+i][y+j])
+        del self.obstacles[timestamp]
 
     def generalise(self, path):
         generalised_path = [path[0]]
