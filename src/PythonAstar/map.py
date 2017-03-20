@@ -10,11 +10,10 @@ It also provides a path finding algorithm
 """
 class Map(object):
 
-    def __init__(self, graph, nodes):
-        self.graph = graph  # static representation of the map
-        self.nodes = nodes
-        self.width = len(nodes[0])
-        self.height = len(nodes)
+    def __init__(self, array):
+        self.array = array  # static representation of the map
+        self.width = len(array[0])
+        self.height = len(array)
         self.obstacles = {}
 
     # turns a pair into an astar node
@@ -23,6 +22,45 @@ class Map(object):
             return self.nodes[location[1]][location[0]]
         else:
             return location
+
+    # creates an AStarNodes map of the spefied dimensions
+    def make_graph(source, destination):
+        dx = source.x - destination.x + 50
+        dy = source.y - destination.y + 50
+        nodes = [[AStarNode(x, y) for y in range(dx)] for x in range(dy)]
+        graph = {}
+        for x, y in product(range(width), range(height)):
+            node = nodes[x][y]
+            graph[node] = []
+            for i, j in [(0, 1), (0, -1), (1, 0), (-1, 0)]:
+                if not (0 <= x + i < width):
+                    continue
+                if not (0 <= y + j < height):
+                    continue
+                graph[nodes[x][y]].append(nodes[x+i][y+j])
+
+        return graph, nodes
+
+    # creates walls for where the map is not accessable i.e. the places where there are 1's
+    def make_walls(graph, nodes):
+        width = len(nodes[0])
+        height = len(nodes)
+        y = 0
+        for row in :
+            nodes = [[AStarNode(x, y) for y in range(height)] for x in range(width)]
+            for x in range(len(row)):
+                if row[x] == '1':
+                    nodes[x][y].obstacle = True
+                    for i, j in [(0, 1), (0, -1), (1, 0), (-1, 0)]:
+                        if not (0 <= x + i < width):
+                            continue
+                        if not (0 <= y + j < height):
+                            continue
+                        if nodes[x+i][y+j] in graph:
+                            if nodes[x][y] in graph[nodes[x+i][y+j]]:
+                                graph[nodes[x+i][y+j]].remove(nodes[x][y])
+                                graph[nodes[x][y]] = []
+            y += 1
 
     # returns a path in the form of points from source to destination
     def get_path(self, source, destination):
