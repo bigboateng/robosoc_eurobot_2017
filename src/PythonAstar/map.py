@@ -71,7 +71,7 @@ class Map(object):
         
         for x in range(len(nodes[0])):
             for y in range(len(nodes)):
-                graph[nodes[y][x]] = set()
+                graph[nodes[y][x]] = []
         
         for a_x in range(min_x, max_x):
             for a_y in range(min_y, max_y):
@@ -99,8 +99,8 @@ class Map(object):
                         if not (min_y <= a_y + j < max_y-1):
                             continue
                         if not nodes[a_y+i][a_x+i].obstacle:
-                            graph[nodes[a_y+j][a_x+i]].add(nodes[ a_y ][ a_x ])
-                            graph[nodes[ a_y ][ a_x ]].add(nodes[a_y+j][a_x+i])
+                            graph[nodes[a_y+j][a_x+i]].append(nodes[ a_y ][ a_x ])
+                            graph[nodes[ a_y ][ a_x ]].append(nodes[a_y+j][a_x+i])
                 else:
                     print(a_x, a_y, "is obstacle")
         print(" src " + str(a_src_x) + " " + str(a_src_y) )
