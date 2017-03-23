@@ -1,7 +1,6 @@
 from astar import AStar, AStarNode
 from exception import *
 from math import sqrt
-import datetime
 import time
 
 """
@@ -106,7 +105,6 @@ class Map(object):
         return graph, nodes, nodes[a_src_y][a_src_x], nodes[a_dist_y][a_dist_x], boundaries
 
     def generalise(self, path):
-        print("Generalising path")
         generalised_path = [path[0]] # gets the first element from path
         i = 1 
         while i < len(path):
@@ -125,7 +123,7 @@ class Map(object):
         distance = 9999999
         for i in range(min(v[0], w[0]), max(v[0], w[0]) + 1):
             for j in range(min(v[1], w[1]), max(v[1], w[1]) + 1):
-                if self.array[j][i] > 0 :
+                if self.array[j][i] > 0:
                     distance = min(self.distance_to_line( v[0], v[1], w[0], w[1], i, j), distance)
                     #print("obstacle in area", (i, j), " dist to line ", distance)
                     if distance < 0.7:
@@ -155,11 +153,17 @@ class Map(object):
 
     # returns a path in the form of points from source to destination
     def get_path(self, source, destination):
-        time
+        make_graph_time = time.time()
         graph, nodes, s, d, boundaries = self.make_graph(source, destination)
         astar = AStar(graph, nodes)
+        make_graph_time = time.time() - make_graph_time
+        print("make_graph_time " + str(make_graph_time))
 
+        astar_time = time.time()
         path = astar.search(s, d)
+        astar_time = time.time() - astar_time
+        print("astar_time " + str(astar_time))
+
         #self.printNodes(graph, nodes)
         if path is None:
             raise PathNotFoundException
@@ -180,7 +184,10 @@ class Map(object):
             generalised = path_in_context
             return generalised, path_in_context
 
+        generalise_time = time.time()
         generalised = self.generalise(path_in_context)
+        generalise_time = time.time() - generalise_time
+        print("generalise_time " + str(generalise_time))
 
         if generalised is None:
             raise PathNotFoundException
