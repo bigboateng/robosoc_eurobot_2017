@@ -6,7 +6,7 @@ class AStarNode(object):
         self.x = x
         self.y = y
         self.h = 0  # heuristic cost
-        self.g = sys.maxsize  # move cost
+        self.g = 0  # move cost
         self.obstacle = False
         self.parent = None
 
@@ -25,6 +25,9 @@ class AStarNode(object):
 
     def __ne__(self, other):
         return not(self == other)
+
+    def __repr__(self):
+        return '(%d %d)' % (self.x, self.y)
 
 class AStar(object):
     def __init__(self, graph, nodes):
@@ -45,7 +48,7 @@ class AStar(object):
         start = self.get_node(s)
         end = self.get_node(e)
         discovered = set()
-        visited = set()
+        explored = set()
         current = start
         discovered.add(current)
 
@@ -57,23 +60,32 @@ class AStar(object):
                 while current.parent:
                     path.append(current)
                     current = current.parent
+                    try:
+                        if current == current.parent.parent:
+                            break
+                    except:
+                        pass
                 path.append(current)
                 return path[::-1]
 
             discovered.remove(current)
-            visited.add(current)
+            explored.add(current)
             for node in self.graph[current]:
-                if node.obstacle:
-                    continue
-                if node in visited:
+                if node in explored:
                     continue
                 if node in discovered:
-                    new_g = current.g + current.move_cost(node)  # new move cost
+                    cost = current.move_cost(node)
+                    if cost == 14:
+                        continue
+                    new_g = current.g + cost
                     if node.g > new_g:
                         node.g = new_g
                         node.parent = current
                 else:
-                    node.g = current.g + current.move_cost(node)
+                    cost = current.move_cost(node)
+                    if cost == 14:
+                        continue
+                    node.g = current.g + cost
                     node.h = self.heuristic(node, start, end)
                     node.parent = current
                     discovered.add(node)

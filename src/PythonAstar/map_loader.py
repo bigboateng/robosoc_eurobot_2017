@@ -18,7 +18,7 @@ class MapLoader(object):
 		print ("opening file: " + self.file_path)
 		file = open(self.file_path, 'r')
 		gridString = file.read()
-		str_array = [ list(line) for line in gridString.split("\n")]
+		str_array = [ list(line) for line in gridString.split("\n") ]
 		array = [[ int(str_array[y][x]) for x in range(len(str_array[0]))] for y in range(len(str_array))]
 		return Map(array), array
 

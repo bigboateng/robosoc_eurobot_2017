@@ -24,8 +24,7 @@ class Visualiser(object):
     """
         width and height dictate how many squares are drawn
     """
-    def draw(self, path, gen_path, width, height):
-        path = gen_path
+    def draw(self, path, gen_path, boundaries, width, height):
         print("width = ", width, "height = ", height)
         x_size = self.width/width
         y_size = self.height/height
@@ -49,12 +48,30 @@ class Visualiser(object):
                 canvas.create_rectangle(i*x_size, j*y_size, (i+1)*x_size, (j+1)*y_size, width=1, fill=col)
                 #draw.rectangle((i*x_size, j*y_size, (i+1)*x_size, (j+1)*y_size), width=0, fill=col)
         
+        canvas.create_rectangle(boundaries[0]*x_size, boundaries[2]*y_size, boundaries[1]*x_size, boundaries[3]*y_size, width=3, outline= color[1])
+
         prev = path[0]
         x_ratio = self.width/width
         y_ratio = self.height/height
         for i in range(1, len(path)):
             node = path[i]
-            canvas.create_line((prev[0]*x_ratio+0.5*x_ratio, prev[1]*y_ratio+0.5*y_ratio, node[0]*x_ratio+0.5*x_ratio, node[1]*y_ratio+0.5*y_ratio), width=2,fill=color[2])
+            x1 = int(prev[0]*x_ratio+0.5*x_ratio)
+            y1 = int(prev[1]*y_ratio+0.5*y_ratio)
+            x2 = int(node[0]*x_ratio+0.5*x_ratio)
+            y2 = int(node[1]*y_ratio+0.5*y_ratio)
+            canvas.create_line(( x1, y1, x2, y2), width=2,fill=color[2])
+            prev = node
+
+        prev = gen_path[0]
+        x_ratio = self.width/width
+        y_ratio = self.height/height
+        for i in range(1, len(gen_path)):
+            node = gen_path[i]
+            x1 = int(prev[0]*x_ratio+0.5*x_ratio)
+            y1 = int(prev[1]*y_ratio+0.5*y_ratio)
+            x2 = int(node[0]*x_ratio+0.5*x_ratio)
+            y2 = int(node[1]*y_ratio+0.5*y_ratio)
+            canvas.create_line(( x1, y1, x2, y2), width=2,fill=color[3])
             prev = node
 
         mainloop()
