@@ -52,8 +52,8 @@ class MapHelper():
         self.ramp = {}
         self.ramp["blue"] = {}        
         self.ramp["yellow"] = {}
-        self.ramp["blue"]["A"] = (0,149)
-        self.ramp["yellow"]["A"] = (300,149)
+        self.ramp["blue"]["A"] = (149,0)
+        self.ramp["yellow"]["A"] = (149,300)
         self.net = {}
         self.net["blue"] = {}        
         self.net["yellow"] = {}
