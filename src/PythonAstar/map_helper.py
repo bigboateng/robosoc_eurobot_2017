@@ -13,5 +13,11 @@ class MapHelper():
         self.cylinders["blue"]["D"] = (90,140)
         self.cylinders["blue"]["E"] = (100,60)
         self.cylinders["blue"]["F"] = (95,20)
-        self.cylinders["yellow"]["B"] = (500,1100)
+        self.cylinders["yellow"]["A"] = (280,60)
+        self.cylinders["yellow"]["B"] = (250,110)
+        self.cylinders["yellow"]["C"] = (220,185)
+        self.cylinders["yellow"]["D"] = (210,140)
+        self.cylinders["yellow"]["E"] = (60,200)
+        self.cylinders["yellow"]["F"] = (205,20)
+        
         # ... add others ... like in the form above
