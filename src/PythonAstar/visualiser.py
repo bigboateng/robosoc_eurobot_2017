@@ -74,6 +74,9 @@ class Visualiser(object):
             canvas.create_line(( x1, y1, x2, y2), width=2,fill=color[3])
             prev = node
 
+        i, j = MapHelper().cylinders["blue"]["A"]
+        canvas.create_rectangle(i*x_ratio, j*y_ratio, (i+1)*x_ratio, (j+1)*y_ratio, width=1, fill=color[0])
+
         mainloop()
 
 """

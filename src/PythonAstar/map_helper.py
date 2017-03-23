@@ -7,5 +7,11 @@ class MapHelper():
         self.cylinders = {}
         self.cylinders["blue"] = {}        
         self.cylinders["yellow"] = {}
-        self.cylinders["blue"]["A"] = (200,600)  # list of all cylinders for blue, (x,y) with map being in horizontal position and (0,0) being in the upper left
+        self.cylinders["blue"]["A"] = (20,60)  # list of all cylinders for blue, (x,y) with map being in horizontal position and (0,0) being in the upper left
+        self.cylinders["blue"]["B"] = (50,110)
+        self.cylinders["blue"]["C"] = (80,185)
+        self.cylinders["blue"]["D"] = (90,140)
+        self.cylinders["blue"]["E"] = (100,60)
+        self.cylinders["blue"]["F"] = (95,20)
+        self.cylinders["yellow"]["B"] = (500,1100)
         # ... add others ... like in the form above
