@@ -77,6 +77,63 @@ class Visualiser(object):
         i, j = MapHelper().cylinders["blue"]["A"]
         canvas.create_rectangle(i*x_ratio, j*y_ratio, (i+1)*x_ratio, (j+1)*y_ratio, width=1, fill=color[0])
 
+        i, j = MapHelper().cylinders["blue"]["B"]
+        canvas.create_rectangle(i*x_ratio, j*y_ratio, (i+1)*x_ratio, (j+1)*y_ratio, width=1, fill=color[0])
+
+        i, j = MapHelper().cylinders["blue"]["C"]
+        canvas.create_rectangle(i*x_ratio, j*y_ratio, (i+1)*x_ratio, (j+1)*y_ratio, width=1, fill=color[0])
+
+        i, j = MapHelper().cylinders["blue"]["D"]
+        canvas.create_rectangle(i*x_ratio, j*y_ratio, (i+1)*x_ratio, (j+1)*y_ratio, width=1, fill=color[0])
+
+        i, j = MapHelper().cylinders["blue"]["E"]
+        canvas.create_rectangle(i*x_ratio, j*y_ratio, (i+1)*x_ratio, (j+1)*y_ratio, width=1, fill=color[0])
+
+        i, j = MapHelper().cylinders["blue"]["F"]
+        canvas.create_rectangle(i*x_ratio, j*y_ratio, (i+1)*x_ratio, (j+1)*y_ratio, width=1, fill=color[0])
+
+        i, j = MapHelper().cylinders["yellow"]["A"]
+        canvas.create_rectangle(i*x_ratio, j*y_ratio, (i+1)*x_ratio, (j+1)*y_ratio, width=1, fill=color[0])
+
+        i, j = MapHelper().cylinders["yellow"]["B"]
+        canvas.create_rectangle(i*x_ratio, j*y_ratio, (i+1)*x_ratio, (j+1)*y_ratio, width=1, fill=color[0])
+
+        i, j = MapHelper().cylinders["yellow"]["C"]
+        canvas.create_rectangle(i*x_ratio, j*y_ratio, (i+1)*x_ratio, (j+1)*y_ratio, width=1, fill=color[0])
+
+        i, j = MapHelper().cylinders["yellow"]["D"]
+        canvas.create_rectangle(i*x_ratio, j*y_ratio, (i+1)*x_ratio, (j+1)*y_ratio, width=1, fill=color[0])
+
+        i, j = MapHelper().cylinders["yellow"]["E"]
+        canvas.create_rectangle(i*x_ratio, j*y_ratio, (i+1)*x_ratio, (j+1)*y_ratio, width=1, fill=color[0])
+
+        i, j = MapHelper().cylinders["yellow"]["F"]
+        canvas.create_rectangle(i*x_ratio, j*y_ratio, (i+1)*x_ratio, (j+1)*y_ratio, width=1, fill=color[0])
+        
+        i, j = MapHelper().moonbases["blue"]["A"]
+        canvas.create_rectangle(i*x_ratio, j*y_ratio, (i+1)*x_ratio, (j+1)*y_ratio, width=1, fill=color[0])
+
+        i, j = MapHelper().moonbases["blue"]["B"]
+        canvas.create_rectangle(i*x_ratio, j*y_ratio, (i+1)*x_ratio, (j+1)*y_ratio, width=1, fill=color[0])
+
+        i, j = MapHelper().moonbases["yellow"]["A"]
+        canvas.create_rectangle(i*x_ratio, j*y_ratio, (i+1)*x_ratio, (j+1)*y_ratio, width=1, fill=color[0])
+
+        i, j = MapHelper().moonbases["yellow"]["B"]
+        canvas.create_rectangle(i*x_ratio, j*y_ratio, (i+1)*x_ratio, (j+1)*y_ratio, width=1, fill=color[0])
+        
+        i, j = MapHelper().moonbases["blue"]["A"]
+        canvas.create_rectangle(i*x_ratio, j*y_ratio, (i+1)*x_ratio, (j+1)*y_ratio, width=1, fill=color[0])
+
+        i, j = MapHelper().moonbases["blue"]["B"]
+        canvas.create_rectangle(i*x_ratio, j*y_ratio, (i+1)*x_ratio, (j+1)*y_ratio, width=1, fill=color[0])
+
+        i, j = MapHelper().moonbases["yellow"]["A"]
+        canvas.create_rectangle(i*x_ratio, j*y_ratio, (i+1)*x_ratio, (j+1)*y_ratio, width=1, fill=color[0])
+
+        i, j = MapHelper().moonbases["yellow"]["B"]
+        canvas.create_rectangle(i*x_ratio, j*y_ratio, (i+1)*x_ratio, (j+1)*y_ratio, width=1, fill=color[0])
+
         mainloop()
 
 """
