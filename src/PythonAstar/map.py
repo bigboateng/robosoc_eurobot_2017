@@ -1,6 +1,7 @@
 from astar import AStar, AStarNode
 from exception import *
 from math import sqrt
+import datetime
 import time
 
 """
@@ -16,7 +17,7 @@ class Map(object):
         self.height = len(array)
         self.obstacles = {}
         self.mapfactor = 5  # map factor is the number of small squares per Astar node 
-        self.allow = self.height / (self.mapfactor * 4)  # allowance which states the extra border around the smaller map.
+        self.allow = self.height / (self.mapfactor * 4)*2  # allowance which states the extra border around the smaller map.
         self.nodes = [[AStarNode(x, y) for x in range(self.width/self.mapfactor)] for y in range(self.height/self.mapfactor)]
         #print("nodes", len(self.nodes[0]), len(self.nodes))
         self.graph = {}
@@ -105,7 +106,7 @@ class Map(object):
         return graph, nodes, nodes[a_src_y][a_src_x], nodes[a_dist_y][a_dist_x], boundaries
 
     def generalise(self, path):
-        print("Generalising path", path)
+        print("Generalising path")
         generalised_path = [path[0]] # gets the first element from path
         i = 1 
         while i < len(path):
@@ -114,19 +115,19 @@ class Map(object):
             # loop until there is an obstacle between the two points v & path[i]
             while i < len(path) and self.can_draw_line(v, path[i]):
                 i += 1
-            print("appending",path[i-1])
+            #print("appending",path[i-1])
             generalised_path.append(path[i-1])
         generalised_path.append(path[-1])
         return generalised_path
 
     def can_draw_line(self, v, w):
-        print("can draw? ", v, w)
+        #print("can draw? ", v, w)
         distance = 9999999
         for i in range(min(v[0], w[0]), max(v[0], w[0]) + 1):
             for j in range(min(v[1], w[1]), max(v[1], w[1]) + 1):
                 if self.array[j][i] > 0 :
                     distance = min(self.distance_to_line( v[0], v[1], w[0], w[1], i, j), distance)
-                    print("obstacle in area", (i, j), " dist to line ", distance)
+                    #print("obstacle in area", (i, j), " dist to line ", distance)
                     if distance < 0.7:
                         return False
         return distance >= 0.7
@@ -139,7 +140,7 @@ class Map(object):
         x1x = (x1 - x)
         ab = abs(dx*y1y - dy*x1x)
         sq = sqrt(dy**2 + dx**2)
-        print("line dist", dx, dy, y1y, x1x, ab, sq),
+        #print("line dist", dx, dy, y1y, x1x, ab, sq),
         return ab/sq
 
     def printNodes(self, graph, nodes):
@@ -154,10 +155,12 @@ class Map(object):
 
     # returns a path in the form of points from source to destination
     def get_path(self, source, destination):
+        time
         graph, nodes, s, d, boundaries = self.make_graph(source, destination)
         astar = AStar(graph, nodes)
+
         path = astar.search(s, d)
-        self.printNodes(graph, nodes)
+        #self.printNodes(graph, nodes)
         if path is None:
             raise PathNotFoundException
 

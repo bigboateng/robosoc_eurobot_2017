@@ -25,7 +25,7 @@ class Visualiser(object):
         width and height dictate how many squares are drawn
     """
     def draw(self, path, gen_path, boundaries, width, height):
-        print("width = ", width, "height = ", height)
+        #print("width = ", width, "height = ", height)
         x_size = self.width/width
         y_size = self.height/height
 
