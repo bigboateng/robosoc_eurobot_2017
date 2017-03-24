@@ -89,6 +89,10 @@ class MD25 :
     self.PULSES_PER_REVOLUTION = 360
     self.mul_count = self.PI * self.robot.wheel_diameter / self.PULSES_PER_REVOLUTION
 
+
+  def set_acceleration(self, accel):
+    self.i2c.write8(self.__MD25_ACCELERATION. accel)
+  
   def forward(self, speed=100):
     self.i2c.write8(self.__MD25_SPEED_1, speed)
     self.i2c.write8(self.__MD25_SPEED_2, speed)
@@ -148,15 +152,22 @@ class MD25 :
     # Updates x, y, theta 
       rightDelta = -self.readEncoder(2)*self.mul_count
       leftDelta = -(self.readEncoder(1)*self.mul_count)
+      #Update total values
+      self.lastReadingRight += rightDelta 
+      self.lastReadingLeft += leftDelta
       if abs(leftDelta - rightDelta) < 1.0e-6:  # basically going straight
-        self.pos_x += leftDelta * cos(self.theta)
-        self.pos_y += rightDelta * sin(self.theta)
+        #self.pos_x += leftDelta * cos(self.theta)
+        #self.pos_y += rightDelta * sin(self.theta)
+        self.pos_x += self.lastReadingLeft * cos(self.theta)
+        self.pos_y += self.lastReadingRight * sin(self.theta)
 	self.resetEncoders()
 	#print("Straight")
       else:
 	#print("Arc")
-        R = self.robot.axle_length * (leftDelta + rightDelta) / (2 * (rightDelta - leftDelta))
-        wd = (rightDelta - leftDelta) / (self.robot.axle_length/2)	
+        #R = self.robot.axle_length * (leftDelta + rightDelta) / (2 * (rightDelta - leftDelta))
+        #wd = (rightDelta - leftDelta) / (self.robot.axle_length/2)
+        R = self.robot.axle_length * (self.lastReadingLeft + self.lastReadingRight) / (2 * (self.lastReadingRight - self.lastReadingLeft))
+        wd = (self.lastReadingRight - self.lastReadingLeft) / (self.robot.axle_length/2)	
         self.pos_x += R * sin(wd + self.theta) - R * sin(self.theta)
         self.pos_y += R * cos(wd + self.theta) - R * cos(self.theta)
         self.theta = self.boundAngle(self.theta + wd)

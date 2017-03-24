@@ -23,7 +23,7 @@
                                  true,  true,  true,
                                  false, false, false,
                                  true,  true,  true,
-                                 true, true, true]</rosparam>
+                                 false, false, false]</rosparam>
 
 
   <param name="odom0_differential" value="true"/>
@@ -34,13 +34,9 @@
 
   <param name="print_diagnostics" value="true"/>
 
-  <!-- ======== ADVANCED PARAMETERS ======== -->
-
-
-  <param name="debug"           value="true"/>
-  <param name="debug_out_file"  value="/home/debug_ekf_localization.txt"/>
 
   </node>
 
+  <!-- <node pkg="master_robot" type="imu_odom_publisher" name="imu_odom_publisher" output="screen"></node> -->
 </launch>
 

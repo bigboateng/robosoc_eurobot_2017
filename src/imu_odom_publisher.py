@@ -23,11 +23,11 @@ last_time = None
 
 # Imu setup
 bno = BNO055.BNO055(rst=7)
-default_refresh_rate = 10
+default_refresh_rate = 30
 log_data = False
 
 # setup primary robot
-secondary_robot = Robot(axle_length = 0.7, wheel_diameter=0.23)
+secondary_robot = Robot(axle_length = 0.7, wheel_diameter=0.1)
 
 # md25 setup 
 motor_controller = MD25(address=0x58, mode=1, debug=True, robot=secondary_robot)
@@ -64,8 +64,9 @@ def onPositionUpdate(data):
    	data.pose.pose.orientation.z,
    	data.pose.pose.orientation.w)
 	heading = tf.transformations.euler_from_quaternion(quaternion)
-	print("X = {}, Y = {}, Heading = {}".format(x,y,heading))
-	print("X' = {}, Y' = {}, Heading' = {}\n".format(x_bar,y_bar,head_))
+	yaw = heading[2]
+	print("X = {:.2f}, Y = {:.2f}, Heading = {:.2f}".format(x,y,yaw))
+	print("X' = {:.2f}, Y' = {:.2f}, Heading' = {:.2f}\n".format(x_bar,y_bar,head_))
 
 
 def init():
