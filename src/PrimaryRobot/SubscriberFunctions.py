@@ -16,14 +16,15 @@ def armOpen():
     rospy.loginfo("close arm here")
 
 #Options for arm - python has no switch statement
-armOptions = {"up" : armUp,
+def armOptions(x):
+    return {"up" : armUp,
            "down" : armDown,
            "open" : armClose,
            "close" : armOpen
-}
+}[x]
 
 def armControl(data):
-    armOptions[data]()
+    armOptions(data)
     
 #TODO finish holder functions with actual python code
 def holderRelease():
@@ -32,12 +33,13 @@ def holderRelease():
 def holderStart():
     rospy.loginfo("return holder to starting position here")
 
-releaseOptions = {"release" : holderRelease,
+def releaseOptions(x):
+    return {"release" : holderRelease,
            "start" : holderStart
-}
+}[x]
 
 def holderControl(data):
-    releaseOptions[data]()
+    releaseOptions(data)
 
 def listener():
 
