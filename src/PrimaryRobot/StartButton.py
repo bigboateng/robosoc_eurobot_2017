@@ -3,18 +3,18 @@
 import rospy
 from std_msgs.msg import String
 import RPi.GPIO as GPIO  
+GPIO.setmode(GPIO.BCM)
 
 # GPIO 23 set up as input. It is pulled up to stop false signals  
-GPIO.setup(11, GPIO.IN, pull_up_down=GPIO.PUD_UP)  
+GPIO.setup(17, GPIO.IN, pull_up_down=GPIO.PUD_UP)  
 
 def talker():
     pub = rospy.Publisher('chatter', String, queue_size=10)
     rospy.init_node('talker', anonymous=True)
     rate = rospy.Rate(10) # 10hz
-    GPIO.add_event_detect(11, GPIO.FALLING, callback=my_callback, bouncetime=300)  
     while not rospy.is_shutdown():
         try:  
-            GPIO.wait_for_edge(23, GPIO.FALLING)  
+            GPIO.wait_for_edge(17, GPIO.FALLING)  
             print "\nFalling edge detected. Now your program can continue with"  
             print "whatever was waiting for a button press."
             hello_str = "Button pressed %s" % rospy.get_time()  
