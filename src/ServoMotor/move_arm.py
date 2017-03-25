@@ -21,24 +21,33 @@ servo_sec.setMaxAngle(180)
 
 # Grabs a cyclinder
 # Note : angles are anti-clockwise
-print "Angle2: -90 deg."
-servo_sec.setAngle(-90)
-time.sleep(2)
+print "Angle2: 40 deg."
+servo_sec.setAngle(40)
+time.sleep(1)
 
 print "Angle1: -88 deg."
 servo_main.setAngle(-88)
-time.sleep(2)
-	
-print "Angle2: 40 deg."
-servo_sec.setAngle(40)
-time.sleep(2)
-
-print "Angle1: 12 deg."
-servo_main.setAngle(12)
-time.sleep(2)
+time.sleep(1)
 
 print "Angle2: -90 deg."
 servo_sec.setAngle(-90)
+time.sleep(1)
+	
+print "Angle2: 40 deg."
+servo_sec.setAngle(40)
+time.sleep(1)
+
+#print "Angle1: 12 deg."
+print "Angle1: 7 deg."
+servo_main.setAngle(7)
+time.sleep(1.5)
+
+print "Angle2: -90 deg."
+servo_sec.setAngle(-90)
+time.sleep(1)
+
+print "Angle2: 40 deg."
+servo_sec.setAngle(40)
+time.sleep(1)
 print "Done"
-time.sleep(2)
 
