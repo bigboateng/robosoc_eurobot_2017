@@ -21,6 +21,11 @@ class Visualiser(object):
         self.height = 600
         self.width = 900
 
+    def to_hex(self, i):
+        return "%0.2X" % i
+
+    def to_gray(self, i, n_of_shades):
+        return "#" + str(self.to_hex((255*(n_of_shades-i))/n_of_shades))*3
     """
         width and height dictate how many squares are drawn
     """
@@ -42,10 +47,10 @@ class Visualiser(object):
         for j in range(height):
             for i in range(width):
                 if self.array[j][i] > 0:
-                    col = color[5]
+                    col = self.to_gray(self.array[j][i], max(max(self.array)))
                 else:
-                    col = color[4]
-                canvas.create_rectangle(i*x_size, j*y_size, (i+1)*x_size, (j+1)*y_size, width=1, fill=col)
+                    col = "white"
+                canvas.create_rectangle(i*x_size, j*y_size, (i+1)*x_size, (j+1)*y_size, width=1, fill=col, outline="black")
                 #draw.rectangle((i*x_size, j*y_size, (i+1)*x_size, (j+1)*y_size), width=0, fill=col)
         
         canvas.create_rectangle(boundaries[0]*x_size, boundaries[2]*y_size, boundaries[1]*x_size, boundaries[3]*y_size, width=3, outline= color[1])
