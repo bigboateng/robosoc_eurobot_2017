@@ -16,13 +16,13 @@ def armOpen():
     rospy.loginfo("close arm here")
 
 def armControl(data):
-    if(data=="up"):
+    if(data.data=="up"):
         armUp()
-    elif(data=="down"):
+    elif(data.data=="down"):
         armDown()
-    elif(data=="close"):
+    elif(data.data=="close"):
         armClose()
-    elif(data=="open"):
+    elif(data.data=="open"):
         armOpen()
     else:
         rospy.loginfo("wrong message")
@@ -34,15 +34,10 @@ def holderRelease():
 def holderStart():
     rospy.loginfo("return holder to starting position here")
 
-def releaseOptions(x):
-    return {"release" : holderRelease,
-           "start" : holderStart
-}[x]
-
 def holderControl(data):
-    if(data=="release"):
+    if(data.data=="release"):
         holderRelease()
-    elif(data=="start"):
+    elif(data.data=="start"):
         holderStart()
     else:
         rospy.loginfo("wrong message")
