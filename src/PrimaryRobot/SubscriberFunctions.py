@@ -2,17 +2,7 @@
 import rospy
 from std_msgs.msg import String
 
-def callback(data):
-    rospy.loginfo(rospy.get_caller_id() + "I heard %s", data.data)
-
 #TODO finish arm functions with actual python code
-#Options for arm - python has no switch statement
-armOptions = {"up" : armUp,
-           "down" : armDown,
-           "open" : armClose,
-           "close" : armOpen
-}
-
 def armUp():
     print "go up with arm here"
 
@@ -25,21 +15,29 @@ def armClose():
 def armOpen():
     print "close arm here"
 
+#Options for arm - python has no switch statement
+armOptions = {"up" : armUp,
+           "down" : armDown,
+           "open" : armClose,
+           "close" : armOpen
+}
+
 def armControl(data):
     armOptions[data]()
     
 #TODO finish holder functions with actual python code
-releaseOptions = {"release" : zero,
-           "start" : sqr
-}
-
 def holderRelease():
     print "release cylinder here"
 
 def holderStart():
     print "return holder to starting position here"
 
+releaseOptions = {"release" : holderRelease,
+           "start" : holderStart
+}
+
 def holderControl(data):
+    releaseOptions[data]()
 
 def listener():
 
