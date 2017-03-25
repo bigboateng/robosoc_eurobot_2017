@@ -4,16 +4,16 @@ from std_msgs.msg import String
 
 #TODO finish arm functions with actual python code
 def armUp():
-    print "go up with arm here"
+    rospy.loginfo("go up with arm here")
 
 def armDown():
-    print "go down with arm here"
+    rospy.loginfo("go down with arm here")
 
 def armClose():
-    print "open arm here"
+    rospy.loginfo("open arm here")
 
 def armOpen():
-    print "close arm here"
+    rospy.loginfo("close arm here")
 
 #Options for arm - python has no switch statement
 armOptions = {"up" : armUp,
@@ -27,10 +27,10 @@ def armControl(data):
     
 #TODO finish holder functions with actual python code
 def holderRelease():
-    print "release cylinder here"
+    rospy.loginfo("release cylinder here")
 
 def holderStart():
-    print "return holder to starting position here"
+    rospy.loginfo("return holder to starting position here")
 
 releaseOptions = {"release" : holderRelease,
            "start" : holderStart
