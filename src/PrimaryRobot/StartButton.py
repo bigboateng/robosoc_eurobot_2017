@@ -9,8 +9,8 @@ GPIO.setmode(GPIO.BCM)
 GPIO.setup(17, GPIO.IN, pull_up_down=GPIO.PUD_UP)  
 
 def talker():
-    pub = rospy.Publisher('chatter', String, queue_size=10)
-    rospy.init_node('talker', anonymous=True)
+    pub = rospy.Publisher('startButton', String, queue_size=10)
+    rospy.init_node('start_button_node', anonymous=True)
     rate = rospy.Rate(10) # 10hz
     while not rospy.is_shutdown():
         try:  
