@@ -83,7 +83,7 @@ class MD25 :
     self.robot = robot
     self.pos_x = 0.0
     self.pos_y = 0.0
-    self.theta = pi/2
+    self.theta = 0.0
     self.lastReadingLeft = 0.0
     self.lastReadingRight = 0.0
     self.PULSES_PER_REVOLUTION = 360
@@ -146,24 +146,23 @@ class MD25 :
 
   def updatePosition(self):
     # Updates x, y, theta 
-      rightDelta = self.readEncoder(2)*self.mul_count
-      leftDelta =  self.readEncoder(1)*self.mul_count
+      rightDelta = -self.readEncoder(2)*self.mul_count
+      leftDelta = -(self.readEncoder(1)*self.mul_count)
       if abs(leftDelta - rightDelta) < 1.0e-6:  # basically going straight
         self.pos_x += leftDelta * cos(self.theta)
         self.pos_y += rightDelta * sin(self.theta)
-	print("Encoder L = {}, Encoder R = {}".format(self.readEncoder(1), self.readEncoder(2)))
-        print("X={}, Y={}, theta={}".format(self.pos_x, self.pos_y, self.theta))
-	#self.resetEncoders()
+	self.resetEncoders()
+	print("Straight")
       else:
+	print("Arc")
         R = self.robot.axle_length * (leftDelta + rightDelta) / (2 * (rightDelta - leftDelta))
-        wd = (rightDelta - leftDelta) / (self.robot.axle_length/2)
-		
+        wd = (rightDelta - leftDelta) / (self.robot.axle_length/2)	
         self.pos_x += R * sin(wd + self.theta) - R * sin(self.theta)
         self.pos_y += R * cos(wd + self.theta) - R * cos(self.theta)
         self.theta = self.boundAngle(self.theta + wd)
 	print("Encoder L = {}, Encoder R = {}".format(self.readEncoder(1), self.readEncoder(2)))
 	print("X={}, Y={}, theta={}".format(self.pos_x, self.pos_y, self.theta))
-	#self.resetEncoders()
+	self.resetEncoders()
 
   def boundAngle(self, angle):
     while angle > pi:

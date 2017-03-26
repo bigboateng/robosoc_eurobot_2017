@@ -74,6 +74,34 @@ class Visualiser(object):
             canvas.create_line(( x1, y1, x2, y2), width=2,fill=color[3])
             prev = node
 
+        map_helper = MapHelper()
+        for point in map_helper.cylinders["blue"].values():
+            i, j = point
+            canvas.create_rectangle(i*x_ratio, j*y_ratio, (i+1)*x_ratio, (j+1)*y_ratio, width=4, outline=color[0])
+
+        for point in map_helper.moonbases["blue"].values():
+            i, j = point
+            canvas.create_rectangle(i*x_ratio, j*y_ratio, (i+1)*x_ratio, (j+1)*y_ratio, width=4, outline=color[1])
+
+        for point in map_helper.rockettowers["blue"].values():
+            i, j = point
+            canvas.create_rectangle(i*x_ratio, j*y_ratio, (i+1)*x_ratio, (j+1)*y_ratio, width=4, outline=color[2])
+
+        for point in map_helper.smallcraters["blue"].values():
+            i, j = point
+            canvas.create_rectangle(i*x_ratio, j*y_ratio, (i+1)*x_ratio, (j+1)*y_ratio, width=4, outline=color[3])
+
+        for point in map_helper.ramp["blue"].values():
+            i, j = point
+            canvas.create_rectangle(i*x_ratio, j*y_ratio, (i+1)*x_ratio, (j+1)*y_ratio, width=4, outline=color[4])
+
+        for point in map_helper.net["blue"].values():
+            i, j = point
+            canvas.create_rectangle(i*x_ratio, j*y_ratio, (i+1)*x_ratio, (j+1)*y_ratio, width=4, outline=color[0])
+
+        for point in map_helper.bigcraters["blue"].values():
+            i, j = point
+            canvas.create_rectangle(i*x_ratio, j*y_ratio, (i+1)*x_ratio, (j+1)*y_ratio, width=4, outline=color[1])
         mainloop()
 
 """

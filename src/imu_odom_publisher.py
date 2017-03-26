@@ -26,10 +26,10 @@ default_refresh_rate = 10
 log_data = False
 
 # setup primary robot
-primary_robot = Robot(axle_length = 0.7, wheel_diameter=0.23)
+secondary_robot = Robot(axle_length = 0.7, wheel_diameter=0.23)
 
 # md25 setup 
-motor_controller = MD25(address=0x58, mode=1, debug=True, robot=primary_robot)
+motor_controller = MD25(address=0x58, mode=1, debug=True, robot=secondary_robot)
 motor_controller.resetEncoders()
 # Tf2 odometry broadcaster 
 odom_transform_broadcaster = tf2_ros.TransformBroadCaster()
@@ -111,7 +111,7 @@ def run_main_program():
 
 		# update the position
 		motor_controller.updatePosition()
-		
+
 		odom_trans.transform.translation.x = motor_controller.getXPosition()
 		odom_trans.transform.translation.y = motor_controller.getYPosition()
 		odom_trans.transform.translation.z = 0.0
