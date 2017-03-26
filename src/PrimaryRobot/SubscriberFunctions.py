@@ -1,39 +1,54 @@
 #!/usr/bin/env python
 import rospy
 from std_msgs.msg import String
-from ..ServoMotor import Servo
+from os import sys, path
+sys.path.append('../ServoMotor')
+import Servo
 import time
 
 # main servo (HX12K)
-arm_servo = Servo(0x40, 0, 50)
+arm_servo = Servo.Servo(0x40, 0, 50)
 arm_servo.setPulseLengthMin(550)
 arm_servo.setPulseLengthMax(2450)
 arm_servo.setMaxAngle(180)
 # Secondary servo (SM-S2309S)
-grabber_servo = Servo(0x40, 1, 50)
+grabber_servo = Servo.Servo(0x40, 1, 50)
 grabber_servo.setPulseLengthMin(550)
 grabber_servo.setPulseLengthMax(2450)
 grabber_servo.setMaxAngle(180)
+# Release Servo
+
+
+
+
+def grabberOpen():
+    print "Angle2: -90 deg."
+    grabber_servo.setAngle(-90)
+
+def grabberClose():
+    rospy.loginfo("close arm here")
+    grabber_servo.setAngle(90)
+    time.sleep(0.1)
+    #grabber_servo.setAngle(0) # stop giving current
 
 #TODO finish arm functions with actual python code
 def armUp():
     rospy.loginfo("go up with arm here")
+    grabberClose()
+    time.sleep(0.2)
     arm_servo.setAngle(12)
     time.sleep(0.1)
 
 def armDown():
     rospy.loginfo("go down with arm here")
+    grabberClose()
+    time.sleep(0.1)
     arm_servo.setAngle(-88)
 
-def grabberClose():
-    print "Angle2: -90 deg."
-    grabber_servo.setAngle(-90)
-
-def grabberOpen():
-    rospy.loginfo("close arm here")
-    grabber_servo.setAngle(-90)
-    time.sleep(0.1)
-    grabber_servo.setAngle(0) # stop giving current
+def defaultPosition():
+    armUp()
+    time.sleep(0.3)
+    grabber_servo.setAngle(0)
 
 def armControl(data):
     if(data.data=="up"):
@@ -44,6 +59,8 @@ def armControl(data):
         grabberClose()
     elif(data.data=="open"):
         grabberOpen()
+    elif(data.data=="default"):
+        defaultPosition()
     else:
         rospy.loginfo("wrong message")
     
@@ -78,5 +95,8 @@ def listener():
     # spin() simply keeps python from exiting until this node is stopped
     rospy.spin()
 
-if __name__ == '__main__':
-    listener()
+if __name__ == '__main__' and __package__ is None:
+    try:
+        listener()
+    except ROSInterruptException:
+        pass
