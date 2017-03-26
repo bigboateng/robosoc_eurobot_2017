@@ -1,19 +1,39 @@
 #!/usr/bin/env python
 import rospy
 from std_msgs.msg import String
+from ..ServoMotor import Servo
+import time
+
+# main servo (HX12K)
+arm_servo = Servo(0x40, 0, 50)
+arm_servo.setPulseLengthMin(550)
+arm_servo.setPulseLengthMax(2450)
+arm_servo.setMaxAngle(180)
+# Secondary servo (SM-S2309S)
+grabber_servo = Servo(0x40, 1, 50)
+grabber_servo.setPulseLengthMin(550)
+grabber_servo.setPulseLengthMax(2450)
+grabber_servo.setMaxAngle(180)
 
 #TODO finish arm functions with actual python code
 def armUp():
     rospy.loginfo("go up with arm here")
+    arm_servo.setAngle(12)
+    time.sleep(0.1)
 
 def armDown():
     rospy.loginfo("go down with arm here")
+    arm_servo.setAngle(-88)
 
-def armClose():
-    rospy.loginfo("open arm here")
+def grabberClose():
+    print "Angle2: -90 deg."
+    grabber_servo.setAngle(-90)
 
-def armOpen():
+def grabberOpen():
     rospy.loginfo("close arm here")
+    grabber_servo.setAngle(-90)
+    time.sleep(0.1)
+    grabber_servo.setAngle(0) # stop giving current
 
 def armControl(data):
     if(data.data=="up"):
@@ -21,9 +41,9 @@ def armControl(data):
     elif(data.data=="down"):
         armDown()
     elif(data.data=="close"):
-        armClose()
+        grabberClose()
     elif(data.data=="open"):
-        armOpen()
+        grabberOpen()
     else:
         rospy.loginfo("wrong message")
     
