@@ -245,7 +245,7 @@ class Map(object):
     def update_obstacles(self):
         now = time.time()
         for timestamp in self.obstacles.keys():
-            if now - timestamp > 15:
+            if now - timestamp > 10:
                 self.remove_obstacle_by_timestamp(timestamp)
 
     def remove_obstacle_by_timestamp(self, timestamp):
