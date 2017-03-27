@@ -106,25 +106,43 @@ class Map(object):
 
     def generalise(self, path):
         generalised_path = [path[0]] # gets the first element from path
-        i = 1 
-        while i < len(path):
-            v = generalised_path[-1] # gets the last element that was added
-            #print(v)
+        
+        while generalised_path[-1] is not path[-1]:
+            point_added = False
+            v = generalised_path[-1] 
+            for i in range(len(path)-1, path.index(v), -1):
+                if self.can_draw_line(path[i], v):
+                    point_added = True
+                    generalised_path.append(path[i])
+                    break
+            if not point_added:
+                generalised_path.append(path.index(v)+1)
+        return generalised_path
+        """
+        break_time = time.time()
+        while i < len(path) and time.time() - break_time < 4 :
+            v = generalised_path[-1]  # gets the last element that was added
+            w = path[i]  # next point in A star path
             # loop until there is an obstacle between the two points v & path[i]
-            while i < len(path) and self.can_draw_line(v, path[i]):
+            while i < len(path) and self.can_draw_line(v, w):
                 i += 1
             #print("appending",path[i-1])
             generalised_path.append(path[i-1])
+
         generalised_path.append(path[-1])
-        return generalised_path
+        return generalised_path"""
 
     def can_draw_line(self, v, w):
         #print("can draw? ", v, w)
+        vx = int(v[0])
+        vy = int(v[1])
+        wx = int(w[0])
+        wy = int(w[1])
         distance = 9999999
-        for i in range(min(v[0], w[0]), max(v[0], w[0]) + 1):
-            for j in range(min(v[1], w[1]), max(v[1], w[1]) + 1):
+        for i in range(min(vx, wx), max(vx, wx) + 1):
+            for j in range(min(vy, wy), max(vy, wy) + 1):
                 if self.array[j][i] > 0:
-                    distance = min(self.distance_to_line( v[0], v[1], w[0], w[1], i, j), distance)
+                    distance = min(self.distance_to_line( vx, vy, wx, wy, i, j), distance)
                     #print("obstacle in area", (i, j), " dist to line ", distance)
                     if distance < 0.7:
                         return False
@@ -195,18 +213,18 @@ class Map(object):
         return path_in_context, generalised, boundaries
 
     # add obstacles of set radius to the map, 
-    def add_obstacle(self, location, radius = 25):
-        loc = get_node(location)
+    def add_obstacle(self, location, radius = 15):
+        x, y = location
         self.obstacles[time.time()] = (location, radius)
-        for i in range(loc.x-radius, loc.x+radius):
-            for j in range(loc.y-radius, loc.y+radius):
-                if not (0 <= loc.x + i < self.width):
+        for i in range(x-radius, x+radius):
+            for j in range(y-radius, y+radius):
+                if not (0 <= i < self.width):
                     continue
-                if not (0 <= loc.y + j < self.height):
+                if not (0 <= j < self.height):
                     continue
-                if not (sqrt(i**2 + j**2) < radius):
+                if not (sqrt((y-j)**2 + (x-i)**2) < radius):
                     continue
-                self.graph[self.node[i][j]] = []
+                self.array[j][ i] += 1
 
     # update obstacles, if they've been longer than 15 seconds on the map then remove them from the list
     def update_obstacles(self):

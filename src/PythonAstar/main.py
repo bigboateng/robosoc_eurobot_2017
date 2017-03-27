@@ -7,10 +7,12 @@ from exception import *
 my_map_helper = MapHelper()
 
 my_map_loader = MapLoader(file_path = "./300by200")
-my_map, array = my_map_loader.load_map(15)
+my_map, array = my_map_loader.load_map(13)
 
 try:
-    path, gen_path, boundaries = my_map.get_path((50, 180),(250, 180))
+    start = my_map_helper.get("net", "blue", "A")
+    end = my_map_helper.get("smallcrater", "blue", "B")
+    path, gen_path, boundaries = my_map.get_path(start, end)
     Visualiser(my_map.array).draw(path, gen_path, boundaries, my_map.width, my_map.height)
 except PathNotFoundException:
     print "Path Not Found"

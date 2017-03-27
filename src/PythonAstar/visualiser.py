@@ -9,6 +9,7 @@ from map import Map
 from map_helper import MapHelper
 from map_loader import MapLoader
 from exception import *
+from math import sin, cos, radians
 
 from PIL import Image, ImageDraw, ImageFont
 import sys
@@ -78,6 +79,24 @@ class Visualiser(object):
             y2 = int(node[1]*y_ratio+0.5*y_ratio)
             canvas.create_line(( x1, y1, x2, y2), width=2,fill=color[3])
             prev = node
+
+        map_helper = MapHelper()
+        for obj in map_helper.objects:
+            for col in ["yellow", "blue"]:
+                for letter in map_helper.objects[obj][col]:
+                    i, j, bearing = map_helper.objects[obj][col][letter]
+                    canvas.create_rectangle(i*x_ratio, j*y_ratio, (i+1)*x_ratio, (j+1)*y_ratio, width=8, outline="#FF0000")
+
+                    i, j, bearing = map_helper.get(obj,col,letter)
+                    canvas.create_rectangle(i*x_ratio, j*y_ratio, (i+1)*x_ratio, (j+1)*y_ratio, width=4, outline="#AA3344")
+
+                    offset = map_helper.offset[obj]
+                    centre = offset[0]
+                    dist = offset[1]
+
+                    x = i + dist*sin(radians(bearing)) 
+                    y = j - dist*cos(radians(bearing))
+                    canvas.create_line(i*x_ratio, j*y_ratio, x*x_ratio, y*y_ratio, width=2, fill="#AA3344")
 
         mainloop()
 
