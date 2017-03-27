@@ -15,3 +15,11 @@ def get_ip_address(ifname):
 mylcd = I2C_LCD_driver.lcd()
 mylcd.lcd_display_string("IP Address:", 1) 
 mylcd.lcd_display_string(get_ip_address('wlan0'), 2)
+
+#script runs from cron using @reboot
+#running crontab -e allows to edit cron
+#this is actual code from crontab:
+# #LCD showing IP address
+# @reboot /home/pi/catkin_ws/src/robosoc_eurobot_2017/src/LCD/display_wifi.py
+# this script needs to be in this folder
+
