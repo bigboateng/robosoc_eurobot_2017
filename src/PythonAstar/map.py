@@ -215,7 +215,8 @@ class Map(object):
     # add obstacles of set radius to the map, 
     def add_obstacle(self, location, radius = 15):
         x, y = location
-        self.obstacles[time.time()] = (location, radius)
+        timestamp = time.time()
+        self.obstacles[timestamp] = (location, radius)
         for i in range(x-radius, x+radius):
             for j in range(y-radius, y+radius):
                 if not (0 <= i < self.width):
@@ -225,26 +226,31 @@ class Map(object):
                 if not (sqrt((y-j)**2 + (x-i)**2) < radius):
                     continue
                 self.array[j][ i] += 1
+        return timestamp
+
+    def remove_obstacle(self, location, radius = 15):
+        x, y = location
+        self.obstacles[time.time()] = (location, radius)
+        for i in range(x-radius, x+radius):
+            for j in range(y-radius, y+radius):
+                if not (0 <= i < self.width):
+                    continue
+                if not (0 <= j < self.height):
+                    continue
+                if not (sqrt((y-j)**2 + (x-i)**2) < radius):
+                    continue
+                self.array[j][ i] -= 1
 
     # update obstacles, if they've been longer than 15 seconds on the map then remove them from the list
     def update_obstacles(self):
         now = time.time()
         for timestamp in self.obstacles.keys():
             if now - timestamp > 15:
-                self.remove_obstacle(timestamp)
+                self.remove_obstacle_by_timestamp(timestamp)
 
-    def remove_obstacle(self, timestamp):
+    def remove_obstacle_by_timestamp(self, timestamp):
         (loc, radius) = self.obstacles[timestamp]
-        for i in range(loc.x-radius, loc.x+radius):
-            for j in range(loc.y-radius, loc.y+radius):
-                for x, y in [(0, 1), (0, -1), (1, 0), (-1, 0)]:
-                    if not (0 <= x + i < self.width):
-                        continue
-                    if not (0 <= y + j < self.height):
-                        continue
-                    if not (sqrt(i**2 + j**2) < radius):
-                        continue
-                    if nodes[x+i][y+j] not in self.graph[self.nodes[j][i]]:
-                        self.graph[self.nodes[j][i]].append(self.nodes[x+i][y+j])
+        self.remove_obstacle(loc, radius)
         del self.obstacles[timestamp]
+
 
