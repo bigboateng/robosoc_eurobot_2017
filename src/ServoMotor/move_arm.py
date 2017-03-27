@@ -37,7 +37,6 @@ print "Angle2: 40 deg."
 servo_sec.setAngle(40)
 time.sleep(1)
 
-#print "Angle1: 12 deg."
 print "Angle1: 7 deg."
 servo_main.setAngle(7)
 time.sleep(1.5)
