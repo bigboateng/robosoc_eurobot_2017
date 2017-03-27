@@ -89,4 +89,4 @@ while True:
     # in meters per second squared):
     #x,y,z = bno.read_gravity()
     # Sleep for a second until the next reading.
-    time.sleep(0.5)
+    time.sleep(0.1)

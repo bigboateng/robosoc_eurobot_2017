@@ -26,13 +26,13 @@ default_refresh_rate = 10
 log_data = False
 
 # setup primary robot
-primary_robot = Robot(axle_length = 0.7, wheel_diameter=0.23)
+secondary_robot = Robot(axle_length = 0.7, wheel_diameter=0.23)
 
 # md25 setup 
-motor_controller = MD25(address=0x58, mode=1, debug=True, robot=primary_robot)
+motor_controller = MD25(address=0x58, mode=1, debug=True, robot=secondary_robot)
 motor_controller.resetEncoders()
 # Tf2 odometry broadcaster 
-odom_transform_broadcaster = tf2_ros.TransformBroadCaster()
+odom_transform_broadcaster = tf2_ros.TransformBroadcaster()
 
 
 
@@ -55,7 +55,7 @@ def convertEurlerAnglesToRads(data):
 
 def init():
 	global rate, current_time, last_time
-	global imu_publisher
+	global imu_publisher, odom_transform_broadcaster, odom_publisher
 	# Initialize the node
 	rospy.init_node("imu_odom_node", anonymous=True)
 	# Refresh at 10Hz	
@@ -72,7 +72,7 @@ def init():
 	run_main_program()
 
 def run_main_program():
-	global rate, imu_publisher
+	global rate, imu_publisher, odom_publisher
 	while not rospy.is_shutdown():
 		# set current time
 		current_time = rospy.Time.now()
@@ -107,11 +107,11 @@ def run_main_program():
 		odom_trans = TransformStamped()
 		odom_trans.header.stamp = current_time
 		odom_trans.header.frame_id = "odom"
-		odom_trans.header.child_frame_id = "base_link"
+		odom_trans.child_frame_id = "base_link"
 
 		# update the position
 		motor_controller.updatePosition()
-		
+
 		odom_trans.transform.translation.x = motor_controller.getXPosition()
 		odom_trans.transform.translation.y = motor_controller.getYPosition()
 		odom_trans.transform.translation.z = 0.0
@@ -125,7 +125,7 @@ def run_main_program():
 		odom = Odometry()
 		odom.header.stamp = current_time
 		odom.header.frame_id = "odom"
-		odom.header.child_frame_id = "base_link"
+		odom.child_frame_id = "base_link"
 		
 		# set the position
 		odom.pose.pose.position.x = motor_controller.getXPosition()
