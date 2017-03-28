@@ -1,0 +1,47 @@
+#!/usr/bin/env python
+import rospy
+from nav_msgs.msg import Odometry
+
+global threads[]
+
+
+def goTo(x,y, angle):
+	global position
+	my_map_loader = MapLoader(file_path = "./300by200")
+	my_map, array = my_map_loader.load_map(13)
+	path, gen_path, boundaries = my_map.get_path(start, end)
+	
+	prevPos = gen_path.pop(0)
+	for x in gen_path:
+		
+		
+
+
+
+def updatePos(data):
+	global position
+	position = [data.pose.pose.position.x,  data.pose.pose.position.y, data.pose.pose.orientation.x]
+	print(position)
+
+
+def goToListener():
+
+    # In ROS, nodes are uniquely named. If two nodes with the same
+    # node are launched, the previous one is kicked off. The
+    # anonymous=True flag means that rospy will choose a unique
+    # name for our 'listener' node so that multiple listeners can
+    # run simultaneously.
+    rospy.init_node('goto_subscriber', anonymous=True)
+
+    rospy.Subscriber("goto", String, armControl)
+
+    rospy.Subscriber("odomtery/filtered", Odometry, updatePos)
+
+    # spin() simply keeps python from exiting until this node is stopped
+    rospy.spin()
+
+if __name__ == "__main__":
+	try:
+		init()
+	except rospy.ROSInterruptException:
+		pass
