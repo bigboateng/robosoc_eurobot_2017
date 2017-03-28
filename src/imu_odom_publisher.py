@@ -17,12 +17,13 @@ import math
 rate = None
 imu_publisher = None
 odom_publisher = None
+odom_subscriber = None
 current_time = None
 last_time = None
 
 # Imu setup
 bno = BNO055.BNO055(rst=7)
-default_refresh_rate = 10
+default_refresh_rate = 50
 log_data = False
 
 # setup primary robot
@@ -34,7 +35,7 @@ motor_controller.resetEncoders()
 # Tf2 odometry broadcaster 
 odom_transform_broadcaster = tf2_ros.TransformBroadcaster()
 
-
+x_bar, y_bar, head_ = 0, 0, 0
 
 def toRadsPerSec(val):
 	return val * 0.0174533
@@ -53,9 +54,23 @@ def convertEurlerAnglesToRads(data):
 	heading, roll, pitch = data
 	return math.radians(heading), math.radians(roll), math.radians(pitch)
 
+def onPositionUpdate(data):
+	global x_bar, y_bar, head_
+	x = data.pose.pose.position.x
+	y = data.pose.pose.position.y
+	quaternion = (
+   	data.pose.pose.orientation.x,
+   	data.pose.pose.orientation.y,
+   	data.pose.pose.orientation.z,
+   	data.pose.pose.orientation.w)
+	heading = tf.transformations.euler_from_quaternion(quaternion)
+	print("X = {}, Y = {}, Heading = {}".format(x,y,heading))
+	print("X' = {}, Y' = {}, Heading' = {}\n".format(x_bar,y_bar,head_))
+
+
 def init():
 	global rate, current_time, last_time
-	global imu_publisher, odom_transform_broadcaster, odom_publisher
+	global imu_publisher, odom_publisher
 	# Initialize the node
 	rospy.init_node("imu_odom_node", anonymous=True)
 	# Refresh at 10Hz	
@@ -64,15 +79,19 @@ def init():
 	if not bno.begin():
 		raise RuntimeError("Failed to initalize IMU, is reset pin 7?")
 	# Imu publisher (for robot_localization node)
-	imu_publisher = rospy.Publisher("imu/data", Imu, queue_size=50)
-	odom_publisher = rospy.Publisher("odom/data", Odometry, queue_size=50)
+	imu_publisher = rospy.Publisher("/imu/data", Imu, queue_size=50)
+	odom_publisher = rospy.Publisher("/odom/data", Odometry, queue_size=50)
+	odom_subscriber = rospy.Subscriber("/odometry/filtered", Odometry, onPositionUpdate)
+	# imu_publisher = rospy.Publisher("imu_data", Imu, queue_size=50)
+	# odom_publisher = rospy.Publisher("odom", Odometry, queue_size=50)
+	# odom_subscriber = rospy.Subscriber("robot_pose_ekf/odom_combined", Odometry, onPositionUpdate)
 	current_time = rospy.Time.now()
 	last_time = rospy.Time.now()
 	# Main loop
 	run_main_program()
 
 def run_main_program():
-	global rate, imu_publisher, odom_publisher
+	global rate, imu_publisher, odom_publisher, x_bar, y_bar, head_
 	while not rospy.is_shutdown():
 		# set current time
 		current_time = rospy.Time.now()
@@ -116,7 +135,10 @@ def run_main_program():
 		odom_trans.transform.translation.y = motor_controller.getYPosition()
 		odom_trans.transform.translation.z = 0.0
 		q = tf.transformations.quaternion_from_euler(0,0, motor_controller.getTheta())
-		odom_trans.transform.rotation = q
+		odom_trans.transform.rotation.x = q[0]
+	        odom_trans.transform.rotation.y = q[1]
+		odom_trans.transform.rotation.z = q[2]
+		odom_trans.transform.rotation.w = q[3]
 
 		# Send the transform
 		odom_transform_broadcaster.sendTransform(odom_trans)
@@ -132,7 +154,9 @@ def run_main_program():
 		odom.pose.pose.position.y = motor_controller.getYPosition()
 		odom.pose.pose.position.z = 0.0
 		odom_publisher.publish(odom)
-
+		x_bar = motor_controller.getXPosition()
+		y_bar = motor_controller.getYPosition()
+		head_ = motor_controller.getTheta()
 		last_time = current_time
 		rate.sleep()
 
