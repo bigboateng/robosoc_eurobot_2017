@@ -106,6 +106,7 @@ def run_main_program():
 		# create Imu object
 		imu = Imu()
 		imu.header.stamp = current_time
+		imu.header.frame_id = "imu";
 		imu.orientation.x = x
 		imu.orientation.y = y
 		imu.orientation.z = z
