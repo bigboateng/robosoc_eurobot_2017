@@ -27,7 +27,7 @@ while True:
     	state = 0
 	count = (count+1)%120
 	print("{}".format(count))
-    elif (state==0 and value < 850):
+    elif (state==0 and value < 100):
 	state = 1
 	count = (count+1)%120
 	print("{}".format(count))

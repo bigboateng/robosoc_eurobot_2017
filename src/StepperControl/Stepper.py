@@ -1,66 +1,104 @@
-from mock import Mock, patch
-import Adafruit_GPIO as GPIO
-#from MockGPIO import MockGPIO
+#!/usr/bin/python
+
+import sys
+import threading
 import time
+import RPi.GPIO as GPIO
 
-rpi_gpio = Mock()
-adapter = GPIO.RPiGPIOAdapter(rpi_gpio, mode=rpi_gpio.BCM)
-adapter.setup(3, GPIO.OUT)
-adapter.output(3, True)
+# ===========================================================================
+# Stepper Class
+# ===========================================================================
 
-GPIO.cleanup()
+class Stepper:
 
-'''
-GPIO.setmode(GPIO.BCM)
- 
-enable_pin = 18
-coil_A_1_pin = 4
-coil_A_2_pin = 17
-coil_B_1_pin = 23
-coil_B_2_pin = 24
- 
-GPIO.setup(enable_pin, GPIO.OUT)
-GPIO.setup(coil_A_1_pin, GPIO.OUT)
-GPIO.setup(coil_A_2_pin, GPIO.OUT)
-GPIO.setup(coil_B_1_pin, GPIO.OUT)
-GPIO.setup(coil_B_2_pin, GPIO.OUT)
- 
-GPIO.output(enable_pin, 1)
- 
-def forward(delay, steps):  
-  for i in range(0, steps):
-    setStep(1, 0, 1, 0)
-    time.sleep(delay)
-    setStep(0, 1, 1, 0)
-    time.sleep(delay)
-    setStep(0, 1, 0, 1)
-    time.sleep(delay)
-    setStep(1, 0, 0, 1)
-    time.sleep(delay)
- 
-def backwards(delay, steps):  
-  for i in range(0, steps):
-    setStep(1, 0, 0, 1)
-    time.sleep(delay)
-    setStep(0, 1, 0, 1)
-    time.sleep(delay)
-    setStep(0, 1, 1, 0)
-    time.sleep(delay)
-    setStep(1, 0, 1, 0)
-    time.sleep(delay)
- 
+  seq = [[1,0,0,1],
+       [1,0,0,0],
+       [1,1,0,0],
+       [0,1,0,0],
+       [0,1,1,0],
+       [0,0,1,0],
+       [0,0,1,1],
+       [0,0,0,1]]
+  stepCount = len(seq)
+  #max_speed = 1200 # steps/second
+  min_delay = (0.01*10000/12)
+  waitTime = min_delay*100
+
+  # Private Fields
+  steps = 0
+  stepCounter = 0
+  stepSeqCounter = 0
+  stepDir = 1 # Set to 1 or 2 for clockwise
+              # Set to -1 or -2 for anti-clockwise
+
+  # Constructor
+  def __init__(self, stepPins=[17,22,23,24], totalSteps=4076, diameter_mm=5, debug=False):
+	# Use BCM GPIO references instead of physical pin numbers
+	self.stepPins = list(stepPins) 
+	# Set all pins as output
+	GPIO.setmode(GPIO.BCM)
+	for pin in self.stepPins:
+  	  GPIO.setup(pin,GPIO.OUT)
+  	  GPIO.output(pin, False)
+	self.totalSteps = totalSteps
+	self.diameter_mm = diameter_mm
+
+	thread = threading.Thread(target=self.run, args=())
+	thread.daemon = True
+	thread.start()
+
+	self.debug = debug 
+
+  def setSpeed(self, speed): 
+	self.waitTime = self.min_delay*100 #TODO
   
-def setStep(w1, w2, w3, w4):
-  GPIO.output(coil_A_1_pin, w1)
-  GPIO.output(coil_A_2_pin, w2)
-  GPIO.output(coil_B_1_pin, w3)
-  GPIO.output(coil_B_2_pin, w4)
+  def changeDir(self, direction):
+	if (direction == 1 | direction == -1) :
+		self.stepDir = direction 
+	else :
+		print "Error: The direction parameter must be 1 or -1"
+  
+  def run(self):
+	self.running = True
+	self.move()
+  
+  def move_step(self, steps):
+	self.steps = steps
+
+  def move(self):
+  	while self.running:
+	  for index in range(self.steps):
+	  	self.steps -= 1
+	  	for pin in range(0,4):
+    	    	xpin=self.stepPins[pin]# Get GPIO
+    	    	if self.seq[self.stepCounter][pin]!=0:
+      	      	  GPIO.output(xpin, True)
+    	    	else:
+      	      	  GPIO.output(xpin, False)
  
-while True:
-  delay = raw_input("Delay between steps (milliseconds)?")
-  steps = raw_input("How many steps forward? ")
-  forward(int(delay) / 1000.0, int(steps))
-  steps = raw_input("How many steps backwards? ")
-  backwards(int(delay) / 1000.0, int(steps))
+  	  	self.stepCounter += self.stepDir
+ 
+  	  	# If we reach the end of the sequence
+  	  	# start again
+  	  	if (self.stepCounter>=self.stepCount):
+    	    	  self.stepCounter = 0
+  	  	if (self.stepCounter<0):
+    	    	  self.stepCounter = self.stepCount+self.stepDir
+ 
+  	  	# Wait before moving on
+  	  	time.sleep(self.waitTime/1000000) 
+
 '''
+  def move_mm(self, millimeters):
+
+  def move_rev(self, revolutions):
+
+  def changeMode(self, mode):
+'''
+
+
+
+
+
+
 
