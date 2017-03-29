@@ -24,6 +24,7 @@ def initialize_node():
     sensor_back = SRF08() # todo(boateng): this is IR!
 
     sensor_threshold = 0.1
+    ir_threshold = 0.1
 
     collision_sensors = []
     while not rospy.is_shutdown():
