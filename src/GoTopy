@@ -10,12 +10,28 @@ def goTo(x,y, angle):
 	my_map_loader = MapLoader(file_path = "./300by200")
 	my_map, array = my_map_loader.load_map(13)
 	path, gen_path, boundaries = my_map.get_path(start, end)
-	
-	prevPos = gen_path.pop(0)
-	for x in gen_path:
+	instrutions = points_to_instructions(gen_path)
+	for i in instructions:
+		if(i[0]=="drive"):
+			
+		else:
+			
 		
 		
-
+def points_to_instructions(points):
+    instructions = []
+    for p in range(1, len(points)):
+    	x0 = points[p-1][0]
+    	x1 = points[p][0]
+    	y0 = points[p-1][1]
+    	y1 = points[p][1]
+    	xDiff = x1 - x0
+        yDiff = y1 - y0
+        angle = degrees(atan2(yDiff, xDiff)) + 90
+        distance = sqrt((x1 - x0)**2 + (y1 - y0)**2)
+        instructions.append("bearing", angle)
+        instructions.append("drive",distance)
+    return instructions
 
 
 def updatePos(data):
