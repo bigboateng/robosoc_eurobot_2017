@@ -64,7 +64,7 @@ def onPositionUpdate(data):
    	data.pose.pose.orientation.z,
    	data.pose.pose.orientation.w)
 	heading = tf.transformations.euler_from_quaternion(quaternion)
-	print("X = {}, Y = {}, Heading = {}".format(x,y,heading))
+	print("X = {}, Y = {}, Heading = {}".format(x,y,heading[2]))
 	print("X' = {}, Y' = {}, Heading' = {}\n".format(x_bar,y_bar,head_))
 
 
@@ -81,7 +81,7 @@ def init():
 	# Imu publisher (for robot_localization node)
 	imu_publisher = rospy.Publisher("/imu_data", Imu, queue_size=50)
 	odom_publisher = rospy.Publisher("/odom", Odometry, queue_size=50)
-	odom_subscriber = rospy.Subscriber("/robot_pose_ekf/odom_combined", Odometry, onPositionUpdate)
+	odom_subscriber = rospy.Subscriber("/odometry/filtered", Odometry, onPositionUpdate)
 	# imu_publisher = rospy.Publisher("imu_data", Imu, queue_size=50)
 	# odom_publisher = rospy.Publisher("odom", Odometry, queue_size=50)
 	# odom_subscriber = rospy.Subscriber("robot_pose_ekf/odom_combined", Odometry, onPositionUpdate)
@@ -113,17 +113,17 @@ def run_main_program():
 		imu.orientation.w = w
 		imu.orientation_covariance = [1.19612e-06,   0,   0,
                                             0,  8.56817e-10,   0,
-                                            0,   0,  0 ]
+                                            0,   0,  0.0000001 ]
 		imu.angular_velocity.x = ang_x
 		imu.angular_velocity.y = ang_y
 		imu.angular_velocity.z = ang_z
-		imu..angular_velocity_covariance = [ 1.70203e-06, 0, 0,
+		imu.angular_velocity_covariance = [ 1.70203e-06, 0, 0,
                                                  0, 2.21773e-09, 0,
                                                  0, 0, 5.99119e-10 ]
 		imu.linear_acceleration.x = accel_x
 		imu.linear_acceleration.y = accel_y
 		imu.linear_acceleration.z = accel_z
-imu.self.imu_msg.linear_acceleration_covariance =  [ 0.420641, 0, 0,
+		imu.linear_acceleration_covariance =  [ 0.420641, 0, 0,
                                                     0, 0.00090971, 0,
                                                     0, 0, 0.00330499 ]
 		imu_publisher.publish(imu)
