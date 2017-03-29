@@ -79,9 +79,9 @@ def init():
 	if not bno.begin():
 		raise RuntimeError("Failed to initalize IMU, is reset pin 7?")
 	# Imu publisher (for robot_localization node)
-	imu_publisher = rospy.Publisher("/imu/data", Imu, queue_size=50)
-	odom_publisher = rospy.Publisher("/odom/data", Odometry, queue_size=50)
-	odom_subscriber = rospy.Subscriber("/odometry/filtered", Odometry, onPositionUpdate)
+	imu_publisher = rospy.Publisher("/imu_data", Imu, queue_size=50)
+	odom_publisher = rospy.Publisher("/odom", Odometry, queue_size=50)
+	odom_subscriber = rospy.Subscriber("/robot_pose_ekf/odom_combined", Odometry, onPositionUpdate)
 	# imu_publisher = rospy.Publisher("imu_data", Imu, queue_size=50)
 	# odom_publisher = rospy.Publisher("odom", Odometry, queue_size=50)
 	# odom_subscriber = rospy.Subscriber("robot_pose_ekf/odom_combined", Odometry, onPositionUpdate)
