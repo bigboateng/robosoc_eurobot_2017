@@ -12,12 +12,18 @@ motor_controller = MD25(robot=primary_robot)
 wait_for_start_state = "wait_for_state"
 choose_task_state = "choose_task_state"
 stop_program_state = "stop_state"
+follow_path_state = "follow_path_state"
+get_path_state = "get_path_state"
 
 # starting state = wait for start buttin
 state = wait_for_start_state
 
 # refresh rate of program
 refresh_rate = 50 # 50 Hz
+
+#configure A*
+my_map_loader = MapLoader(file_path = "./300by200")
+my_map, array = my_map_loader.load_map(13)
 
 
 def start_stop_program(msg): # this will state the main state machine
@@ -44,6 +50,8 @@ def initialize_node():
     while not rospy.is_shutdown():
         if state == stop_program_state:  # stop the motors
             motor_controller.stop()
+	if state == get_path_state:  #get path
+            instructions = my_map.get_instructions(start, end, final_angle)
         rate.sleep()
 
 

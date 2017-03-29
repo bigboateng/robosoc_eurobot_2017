@@ -210,7 +210,14 @@ class Map(object):
         if generalised is None:
             raise PathNotFoundException
 
+
         return path_in_context, generalised, boundaries
+
+    #uses get path and then corvets it into instructions
+    def get_instructions(self, source, destination, finalAngle):
+        path_in_context, generalised, boundaries = get_path(self, source, destination)
+        generalised.append("bearing", finalAngle)
+	return generalised
 
     # add obstacles of set radius to the map, 
     def add_obstacle(self, location, radius = 15):
