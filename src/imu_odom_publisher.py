@@ -111,12 +111,21 @@ def run_main_program():
 		imu.orientation.y = y
 		imu.orientation.z = z
 		imu.orientation.w = w
+		imu.orientation_covariance = [1.19612e-06,   0,   0,
+                                            0,  8.56817e-10,   0,
+                                            0,   0,  0 ]
 		imu.angular_velocity.x = ang_x
 		imu.angular_velocity.y = ang_y
 		imu.angular_velocity.z = ang_z
+		imu..angular_velocity_covariance = [ 1.70203e-06, 0, 0,
+                                                 0, 2.21773e-09, 0,
+                                                 0, 0, 5.99119e-10 ]
 		imu.linear_acceleration.x = accel_x
 		imu.linear_acceleration.y = accel_y
 		imu.linear_acceleration.z = accel_z
+imu.self.imu_msg.linear_acceleration_covariance =  [ 0.420641, 0, 0,
+                                                    0, 0.00090971, 0,
+                                                    0, 0, 0.00330499 ]
 		imu_publisher.publish(imu)
 
 		if log_data:
