@@ -1,29 +1,26 @@
-#!/usr/bin/python
-
-import threading
+import Stepper
 import time
-from Stepper import Stepper
 
-# ===========================================================================
-# Example code 
-# ===========================================================================
+# Define GPIO signals to use
+# Physical pins 11,15,16,18
+# GPIO17,GPIO22,GPIO23,GPIO24
+StepPins1 = [17,22,23,24]
+StepPins2 = [5,6,13,19]
 
-speed = 1200 # steps/second, max: 1200
+steps = 4076/2
+revo = 1/2
 
+Stepper.setupStepper(1, StepPins1, 4076)
+Stepper.setupStepper(2, StepPins2, 4076)
+Stepper.setSpeed(1200) # 1200 steps/sec
+Stepper.moveBoth_revo(revo)
+Stepper.setDirBoth(-1)
+time.sleep(0.5)
+Stepper.moveBoth_step(steps)
+time.sleep(0.5)
+Stepper.move_step(1, 1000)
+time.sleep(0.5)
+Stepper.setDir(2, 1)
+Stepper.move_step(2, 1000)
 
-# Initialisation 
-# Stepper(stepPins=[17,22,23,24], totalSteps=4076, diameter_mm=5)
-stepper = Stepper([17,22,23,24], 4076, 5)
-stepper.setSpeed(speed)
-stepper.move_steps(4000)
-'''
-thread = threading.Thread(target=stepper.move_step, args=(1000))
-thread.daemon = True
-thread.start()
-'''
-#stepper.move_step(4076)
-#stepper.run()
-print "Delay"
-time.sleep(10)
-print "End"
 
