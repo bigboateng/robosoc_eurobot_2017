@@ -4,7 +4,7 @@ import time
 from ESC import ESC
 
 # ===========================================================================
-# Example code using the d?? 
+# Example code 
 # ===========================================================================
 
 # Initialisation 
@@ -31,12 +31,9 @@ while i:
 	time.sleep(0.5)
 	'''
 	print "Speed: 20%"
-        esc.setSpeed(19)
+        esc.setSpeed(23)
         time.sleep(15)
 	'''
-	print "Speed: 40%"
-        esc.setSpeed(40)
-        time.sleep(2)
 	print "Speed: 50%"
         esc.setSpeed(50)
         time.sleep(2)

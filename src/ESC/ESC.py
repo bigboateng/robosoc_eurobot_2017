@@ -27,7 +27,7 @@ class ESC :
 	if (channel < 0 | channel > 15) :
 		print "Error: The channel number must be between 0 and 15"
  
-	self.debug = debug # Make sure the specified mode
+	self.debug = debug 
 
   def setSpeed(self, speed): # speed: 0-100%
 	if (speed >= 0 & speed <= 100) :

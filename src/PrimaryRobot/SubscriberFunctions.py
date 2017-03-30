@@ -20,14 +20,15 @@ grabber_servo.setMaxAngle(180)
 
 
 
-
+#TODO check delays
 def grabberOpen():
-    print "Angle2: -90 deg."
+    print "Open grabber (-90 deg.)"
     grabber_servo.setAngle(-90)
 
 def grabberClose():
     rospy.loginfo("close arm here")
-    grabber_servo.setAngle(90)
+    print "Close grabber (40 deg.)"
+    grabber_servo.setAngle(40)
     time.sleep(0.1)
     #grabber_servo.setAngle(0) # stop giving current
 
@@ -36,7 +37,7 @@ def armUp():
     rospy.loginfo("go up with arm here")
     grabberClose()
     time.sleep(0.2)
-    arm_servo.setAngle(12)
+    arm_servo.setAngle(7)
     time.sleep(0.1)
 
 def armDown():
