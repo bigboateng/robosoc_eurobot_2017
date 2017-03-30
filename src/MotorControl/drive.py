@@ -4,7 +4,7 @@ from Robot import Robot
 import math
 
 secondary_robot = Robot(0.181, 0.1)
-controller = MD25(0x58,1,True,secondary_robot)
+controller = MD25(0x59,1,True,secondary_robot)
 controller.resetEncoders()
 class _GetchUnix:
   def __init__(self):

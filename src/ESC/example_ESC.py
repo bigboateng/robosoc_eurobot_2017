@@ -30,9 +30,16 @@ while i:
 	esc.setSpeed(10)
 	time.sleep(0.5)
 	'''
-	print "Speed: 20%"
-        esc.setSpeed(19)
-        time.sleep(15)
+	print "Speed: 28%"
+	esc.setSpeed(28)
+	time.sleep(30)
+	print "Speed: 0%"
+	esc.setSpeed(0)
+	time.sleep(6)
+
+	print "Speed: 40%"
+	esc.setSpeed(40)
+	time.sleep(5)
 	'''
 	print "Speed: 40%"
         esc.setSpeed(40)
@@ -52,7 +59,7 @@ while i:
         time.sleep(1)
 	'''
 	print "Speed: 0%"
-        esc.setSpeed(0)
-        time.sleep(4)
+	esc.setSpeed(0)
+	time.sleep(4)
 	
 
