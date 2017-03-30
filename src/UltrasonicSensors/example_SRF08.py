@@ -8,7 +8,7 @@ from SRF08 import SRF08
 
 # Initialise the SRF08
 # Change the I2C address to match your module address
-address = 0xE0 # WARNING : if you use the address profided by i2cdetect,
+address = 0xE0 # WARNING : if you use the address provided by i2cdetect,
 	       #	   address = [addr] << 1
 UltraSonic_sensor = SRF08(address >> 1, 2, False)
 i = 1
