@@ -1,16 +1,22 @@
 #!/usr/bin/env python
 import rospy
 
-from src.PythonAstar.map_loader import MapLoader
-from ..MD25 import MD25
-from ..Robot import Robot
+from os import sys, path
+
+sys.path.insert(0, "/MD25") #map_loader.MapLoader
+#from PythonAstar.map_loader import MapLoader
+from MD25 import MD25
+import Robot
 from std_msgs.msg import String
-from ..StateMachine.PrimaryRobotState import States, ArmState
+from PrimaryRobotState import * #import States, ArmState
+from PID import PID
 import time
 # object to hold robot parameters
-primary_robot = Robot(axle_length=0.181,wheel_diameter=0.1)
+primary_robot = Robot.Robot(axle_length=0.181,wheel_diameter=0.1)
 # control motors
-motor_controller = MD25(robot=primary_robot)
+motor_controller = MD25(address=0x59, robot=primary_robot)
+motor_controller.resetEncoders()
+motor_controller.set_acceleration(1)
 
 # starting state = wait for start buttin
 state = States.WAIT_FOR_START_BUTTON
@@ -18,11 +24,11 @@ state = States.WAIT_FOR_START_BUTTON
 # state of robotic arm
 arm_state = ArmState.COMPLETE
 # refresh rate of program
-refresh_rate = 50 # 50 Hz
+refresh_rate = 100 # 50 Hz
 
 #configure A*
-my_map_loader = MapLoader(file_path = "./300by200")
-my_map, array = my_map_loader.load_map(13)
+#my_map_loader = MapLoader(file_path = "./300by200")
+#my_map, array = my_map_loader.load_map(13)
 
 # Actions to be done
 global_actions = [(43,44,56.6)]
@@ -65,10 +71,21 @@ def initialize_node():
     # Subscribers
     start_stop_program_subscriber = rospy.Subscriber("start_stop_program", String, start_stop_program)
     arm_action_complete_subscriber = rospy.Subscriber("arm_action_complete", String, action_complete)
+
+
+    # left and right wheel PID
+    leftPID = PID()
+    rightPID = PID()
+    has_reached_goal = False 
+    set_point_left = 0.11 * (3.14 / 2)
+    set_point_right = 0.11 * (3.14 / 2) * -1
+    left_complete = False
+    right_comeplete = False
     while not rospy.is_shutdown():
         if state == States.WAIT_FOR_START_BUTTON:
             # do nothing basically, waiting for someone to pull start button
-            pass
+            print("Waiting to start")
+            state = States.GO_TO_GOAL
         elif state == States.CHOOSE_TASK:
             if not len(global_actions) == 0: # then are actions to do
                 action  = global_actions[0]
@@ -88,9 +105,26 @@ def initialize_node():
             elif arm_state == ArmState.COMPLETE: # has finished picking or dropping something
                 state == States.CHOOSE_TASK
         elif state == States.GO_TO_GOAL: # use PID to drive to target distance or turning
-            pass
+            left_error = set_point_left - motor_controller.get_left_distance()
+            right_error = set_point_right - motor_controller.get_right_distance()
+            print("Left Dist = {}, right Dist={}, Left error={}, right error={}".format(motor_controller.get_left_distance(), motor_controller.get_right_distance(), left_error, right_error))
+            if (abs(left_error) > 0.01):
+                motor_controller.set_left_speed(leftPID.update(left_error))
+            else:
+                left_complete = True
+
+            if (abs(right_error) > 0.01):
+                #right_comeplete = True
+                motor_controller.set_right_speed(rightPID.update(right_error))
+            else:
+                right_comeplete = True 
+
+            if left_complete and right_comeplete:
+                state = States.STOP_MOTORS
         elif state == States.STOP_MOTORS:  # stop the motors
             motor_controller.stop()
+            motor_controller.set_right_speed(128)
+            motor_controller.set_left_speed(128)
             time.sleep(0.2)
         elif state == States.EMERGENCY_STOP:
             motor_controller.stop()
