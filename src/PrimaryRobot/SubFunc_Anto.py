@@ -38,10 +38,11 @@ stepperPins2 = [5,6,13,19] # Pins of left stepper
 totalSteps = 4076
 speed = 1200 # 1200 steps/sec max @5V
 # Lift strategy
-revo_lift_1 = 0.3
-revo_lift_2 = 0.7
-revo_tilt_1 = 0.4
-revo_tilt_2 = 0.3
+revo_tilt_1 = 0.4 # 1) Tilt the plate a bit
+revo_lift_1 = 0.3 # 2) Lift the plate a bit
+revo_tilt_2 = 0.3 # 3) Tilt the plate even more
+revo_lift_2 = 0.7 # 4) Lift the plate to the top
+
 side = 'yellow' # blue side / 2: yellow side
 if(side=='blue'):
 	motor_tilt = rightStepper # Right stepper
@@ -142,8 +143,6 @@ def liftSequence(sleep_time=2):
     	Stepper.moveBoth_revo(revo_lift_2)
     	Stepper.move_revo(motor_tilt, revo_tilt_1)
     	Stepper.move_revo(motor_tilt, revo_tilt_2)
-
-
 
 
 
