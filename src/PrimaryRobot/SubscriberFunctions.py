@@ -88,7 +88,7 @@ def listener():
     # run simultaneously.
     rospy.init_node('servo_subscriber', anonymous=True)
 
-    rospy.Subscriber("arm", String, armControl)
+    rospy.Subscriber("arm_controller", String, armControl)
 
     rospy.Subscriber("holder", String, holderControl)
 
