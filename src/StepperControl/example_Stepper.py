@@ -1,26 +1,43 @@
 import Stepper
 import time
+import sys
 
-# Define GPIO signals to use
-# Physical pins 11,15,16,18
-# GPIO17,GPIO22,GPIO23,GPIO24
-StepPins1 = [17,22,23,24]
-StepPins2 = [5,6,13,19]
+# Pins for the two stepper motors
+rightStepper = 1
+leftStepper = 2
+stepperPins1 = [17,22,23,24] # Right stepper
+stepperPins2 = [5,6,13,19] # Left stepper
+totalSteps = 4076
+speed = 1200 # 1200 steps/sec max @5V
 
-steps = 4076/2
-revo = 1/2
+revo_lift_1 = 0.3
+revo_lift_2 = 0.7
+revo_tilt_1 = 0.4
+revo_tilt_2 = 0.3
+side = 'yellow' # blue side / 2: yellow side
 
-Stepper.setupStepper(1, StepPins1, 4076)
-Stepper.setupStepper(2, StepPins2, 4076)
-Stepper.setSpeed(1200) # 1200 steps/sec
-Stepper.moveBoth_revo(revo)
-Stepper.setDirBoth(-1)
-time.sleep(0.5)
-Stepper.moveBoth_step(steps)
-time.sleep(0.5)
-Stepper.move_step(1, 1000)
-time.sleep(0.5)
-Stepper.setDir(2, 1)
-Stepper.move_step(2, 1000)
+if(side=='blue'):
+	motor_tilt = rightStepper # Right stepper
+elif(side=='yellow'):
+	motor_tilt = leftStepper # Left stepper
+else:
+	sys.exit("Error: The side parameter must be 'blue' or 'yellow'")
+
+Stepper.setupStepper(rightStepper, stepperPins1, totalSteps)
+Stepper.setupStepper(leftStepper, stepperPins2, totalSteps)
+Stepper.setSpeed(speed) 
+Stepper.setDir(rightStepper,-1)
+
+Stepper.moveBoth_revo(revo_lift_1)
+Stepper.move_revo(motor_tilt, revo_tilt_1)
+Stepper.moveBoth_revo(revo_lift_2)
+Stepper.move_revo(motor_tilt, revo_tilt_2)
+time.sleep(2)
+Stepper.reverseDirBoth()
+Stepper.moveBoth_revo(revo_lift_1)
+Stepper.moveBoth_revo(revo_lift_2)
+Stepper.move_revo(motor_tilt, revo_tilt_1)
+Stepper.move_revo(motor_tilt, revo_tilt_2)
+
 
 

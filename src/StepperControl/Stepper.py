@@ -55,6 +55,23 @@ def setSpeed(speed=600): # steps/second
 	global WaitTime
 	WaitTime = 1/float(speed)
 
+def reverseDirBoth():
+	global StepperDir1
+	global StepperDir2
+	StepperDir1 = -StepperDir1
+	StepperDir2 = -StepperDir2
+
+def reverseDir(index):
+	global StepperDir1
+	global StepperDir2
+
+	if (index==1):
+		StepperDir1 = -StepperDir1
+	elif (index==2):
+		StepperDir2 = -StepperDir2
+	else:
+		print "Error: the index must be 1 or 2"
+
 def setDirBoth(direction):
 	global StepperDir1
 	global StepperDir2

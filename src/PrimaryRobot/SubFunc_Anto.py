@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import time
 from os import sys, path
 sys.path.append('../UltrasonicSensors')
 from SRF08 import SRF08
@@ -7,7 +8,8 @@ sys.path.append('../IRSensors')
 from IRsensor import IRsensor
 sys.path.append('../ESC')
 from ESC import ESC
-import time
+sys.path.append('../StepperControl')
+import Stepper
 
 # Parameters
 
@@ -28,6 +30,27 @@ channel_PCA9685_ESC = 15
 esc.setPulseLengthMin(1000)
 esc.setPulseLengthMax(2000)
 
+# Stepper motors
+rightStepper = 1 
+leftStepper = 2 
+stepperPins1 = [17,22,23,24] # Pins of right stepper
+stepperPins2 = [5,6,13,19] # Pins of left stepper
+totalSteps = 4076
+speed = 1200 # 1200 steps/sec max @5V
+# Lift strategy
+revo_tilt_1 = 0.4 # 1) Tilt the plate a bit
+revo_lift_1 = 0.3 # 2) Lift the plate a bit
+revo_tilt_2 = 0.3 # 3) Tilt the plate even more
+revo_lift_2 = 0.7 # 4) Lift the plate to the top
+
+side = 'yellow' # blue side / 2: yellow side
+if(side=='blue'):
+	motor_tilt = rightStepper # Right stepper
+elif(side=='yellow'):
+	motor_tilt = leftStepper # Left stepper
+else:
+	sys.exit("Error: The side parameter must be 'blue' or 'yellow'")
+
 
 # Initialisation 
 
@@ -44,30 +67,82 @@ US_sensor_left = SRF08(address_US_sensor_left, 2)
 # ESC
 esc = ESC(address_i2c_ESC, channel_PCA9685_ESC, 50)
 
+# Stepper Motors
+Stepper.setupStepper(rightStepper, stepperPins1, totalSteps)
+Stepper.setupStepper(leftStepper, stepperPins2, totalSteps)
+Stepper.setSpeed(speed) 
+Stepper.setDir(rightStepper,-1)
+
 
 # Functions
 
 def getDistance_IRsensor():
-    IR_sensor_right.getAnalogValue()
-    IR_sensor_left.getAnalogValue()
-    IR_sensor_right.distance # output this to ROS
-    IR_sensor_left.distance # output this to ROS
+    	global IR_sensor_right
+    	global IR_sensor_left
+    	IR_sensor_right.getAnalogValue()
+    	IR_sensor_left.getAnalogValue()
+    	IR_sensor_right.distance # output this to ROS
+    	IR_sensor_left.distance # output this to ROS
 
 def getDistance_USsensor():
-    US_sensor_right.readEcho(1)
-    US_sensor_left.readEcho(1)
-    US_sensor_right.echo[0] # output this to ROS
-    US_sensor_left.echo[0] # output this to ROS
+    	global US_sensor_right
+    	global US_sensor_left
+    	US_sensor_right.readEcho(1)
+    	US_sensor_left.readEcho(1)
+    	US_sensor_right.echo[0] # output this to ROS
+    	US_sensor_left.echo[0] # output this to ROS
 
 def setSpeedESC(speed):
-    esc.setSpeed(speed)
+    	global esc
+    	esc.setSpeed(speed)
 
-def setBallGrabberOn(): # Rename ?
-    esc.setSpeed(23)
+def setBallGrabberOn(speed=28): # Rename ? + change speed
+    	global esc
+    	esc.setSpeed(speed) 
 
 def setBallGrabberOff():
-    esc.setSpeed(0)
+    	global esc
+    	esc.setSpeed(0)
 
+def liftUp():
+	global motor_tilt
+	global revo_lift_1
+	global revo_lift_2
+	global revo_tilt_1
+	global revo_tilt_2
+	Stepper.moveBoth_revo(revo_lift_1)
+    	Stepper.move_revo(motor_tilt, revo_tilt_1)
+    	Stepper.moveBoth_revo(revo_lift_2)
+    	Stepper.move_revo(motor_tilt, revo_tilt_2)
+
+def liftDown():
+	global motor_tilt
+	global revo_lift_1
+	global revo_lift_2
+	global revo_tilt_1
+	global revo_tilt_2
+    	Stepper.reverseDirBoth()
+    	Stepper.moveBoth_revo(revo_lift_1)
+    	Stepper.moveBoth_revo(revo_lift_2)
+    	Stepper.move_revo(motor_tilt, revo_tilt_1)
+    	Stepper.move_revo(motor_tilt, revo_tilt_2)
+
+def liftSequence(sleep_time=2):
+	global motor_tilt
+	global revo_lift_1
+	global revo_lift_2
+	global revo_tilt_1
+	global revo_tilt_2
+	Stepper.moveBoth_revo(revo_lift_1)
+    	Stepper.move_revo(motor_tilt, revo_tilt_1)
+    	Stepper.moveBoth_revo(revo_lift_2)
+    	Stepper.move_revo(motor_tilt, revo_tilt_2)
+    	time.sleep(sleep_time)
+    	Stepper.reverseDirBoth()
+    	Stepper.moveBoth_revo(revo_lift_1)
+    	Stepper.moveBoth_revo(revo_lift_2)
+    	Stepper.move_revo(motor_tilt, revo_tilt_1)
+    	Stepper.move_revo(motor_tilt, revo_tilt_2)
 
 
 
