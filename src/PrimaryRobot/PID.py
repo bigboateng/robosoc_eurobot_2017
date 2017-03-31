@@ -37,7 +37,7 @@ class PID:
 
         PID = self.P_value + self.I_value + self.D_value
 
-        return int(self.limit_speed(PID, 76, 180))
+        return int(self.limit_speed(PID, 0, 225))
 
     def setPoint(self,set_point):
         """

@@ -4,7 +4,7 @@ import time
 from Adafruit_I2C import Adafruit_I2C
 #import Adafruit_GPIO.I2C as Adafruit_I2C
 from Robot import Robot
-from math import cos, sin, pi
+from math import cos, sin, pi, atan2
 # ===========================================================================
 # MD25 Class
 # ===========================================================================
@@ -86,6 +86,8 @@ class MD25 :
     self.theta = 0.0
     self.lastReadingLeft = 0.0
     self.lastReadingRight = 0.0
+    self.countLeft = 0.0
+    self.countRight = 0.0
     self.PULSES_PER_REVOLUTION = 360
     self.mul_count = self.PI * self.robot.wheel_diameter / self.PULSES_PER_REVOLUTION
 
@@ -172,15 +174,34 @@ class MD25 :
         self.resetEncoders()#print("Straight")
       else:
   #print("Arc")
-        R = self.robot.axle_length * (leftDelta + rightDelta) / (2 * (rightDelta - leftDelta))
-        wd = (rightDelta - leftDelta) / (self.robot.axle_length/2)
-        #R = self.robot.axle_length * (self.lastReadingLeft + self.lastReadingRight) / (2 * (self.lastReadingRight - self.lastReadingLeft))
-        #wd = (self.lastReadingRight - self.lastReadingLeft) / (self.robot.axle_length/2)  
+        #R = self.robot.axle_length * (leftDelta + rightDelta) / (2 * (rightDelta - leftDelta))
+        #wd = (rightDelta - leftDelta) / (self.robot.axle_length/2)
+        R = self.robot.axle_length * (self.lastReadingLeft + self.lastReadingRight) / (2 * (self.lastReadingRight - self.lastReadingLeft))
+        wd = (self.lastReadingRight - self.lastReadingLeft) / (self.robot.axle_length/2)  
         self.pos_x += R * sin(wd + self.theta) - R * sin(self.theta)
         self.pos_y += R * cos(wd + self.theta) - R * cos(self.theta)
         self.theta = self.boundAngle(self.theta + wd)
         self.resetEncoders()
         print("Encoder L = {}, Encoder R = {}".format(self.readEncoder(1), self.readEncoder(2)))
+
+  def updatePosition2(self):
+    countNewLeft = self.readEncoder(1)
+    countNewRight = self.readEncoder(2)
+    deltaL = countNewLeft - self.countLeft 
+    deltaR = countNewRight - self.countRight
+
+    distL = deltaL * self.mul_count
+    distR = deltaR * self.mul_count
+    dc = (distL + distR)/2
+
+    self.pos_x += dc * cos(self.theta) * -1
+    self.pos_y += dc * sin(self.theta)
+    theta_new = self.theta + ((distR - distL)/self.robot.axle_length)
+    self.theta = atan2(sin(theta_new), cos(theta_new))
+
+    self.countLeft = countNewLeft
+    self.countRight = countNewRight
+
 
   def boundAngle(self, angle):
     while angle > pi:

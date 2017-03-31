@@ -32,7 +32,7 @@ while i:
 	'''
 	print "Speed: 28%"
 	esc.setSpeed(28)
-	time.sleep(30)
+	time.sleep(15)
 	print "Speed: 0%"
 	esc.setSpeed(0)
 	time.sleep(6)
