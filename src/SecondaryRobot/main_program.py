@@ -14,11 +14,12 @@ from PID import PID
 import time
 from math import radians
 import rospy
+from nav_msgs.msg import Odometry
 
 # object to hold robot parameters
 primary_robot = Robot.Robot(axle_length=0.10265,wheel_diameter=0.097)
 # control motors
-motor_controller = MD25(address=0x59, robot=primary_robot)
+motor_controller = MD25(address=0x58, robot=primary_robot)
 motor_controller.resetEncoders()
 motor_controller.set_acceleration(1)
 
@@ -169,6 +170,8 @@ def initialize_node():
                         state = States.GET_PATH
                     elif type(action) == "str": # then its an action like pick up cylinder
                         state = action
+                else:
+					print("no instructions to do")
         elif state == States.GET_PATH:
             print("State = GET PATH")
             end_position = global_actions[0]
@@ -206,29 +209,30 @@ def initialize_node():
             motor_controller.set_left_speed(128)
             time.sleep(1)
             print("STOP MOTOR ")
-            if len(global_path_instructions):       
-                del global_path_instructions[0]
-                if len(global_path_instructions) > 0:
-                    state = States.CHOOSE_TASK
+            state = States.CHOOSE_TASK
+
         elif state == States.EMERGENCY_STOP:
             motor_controller.stop()
             # stop drum here
-	elif state == States.GET_TO_CYLINDER:
-	    doAction("armClose")
-	    doAction("armDown")
-	    doAction("armOpen")
-            global_path_instructions(("drive", 0.05))
-	elif state == States.PICK_UP_CYLINDER:
-	    doAction("armClose")
-	    doAction("armUp")
-	    if cylinders <4:
-		doAction("armOpen")
-	    cylinders+= 1
+        elif state == States.GET_TO_CYLINDER:
+        	print("getting to cylinder")
+       		doAction("armClose")
+        	doAction("armDown")
+	    	doAction("armOpen")
+        	global_path_instructions = [("drive", 0.05)]
+        elif state == States.PICK_UP_CYLINDER:
+			print("picking up cylinder")
+	    	doAction("armClose")
+	    	doAction("armUp")
+	    	if cylinders <4:
+			doAction("armOpen")
+	    	cylinders+= 1
             global_path_instructions(("drive", -0.05))
-	elif state == States.PUT_DOWN_CYLINDER:
-	    doAction("holderRelease")
-	    doAction("holderReturn")
-	    cylinders-= 1
+		elif state == States.PUT_DOWN_CYLINDER:
+			print("putting down cylinder")
+		    doAction("holderRelease")
+		    doAction("holderReturn")
+		    cylinders-= 1
             if(cylinders>2):
                 doAction("armOpen")
 
