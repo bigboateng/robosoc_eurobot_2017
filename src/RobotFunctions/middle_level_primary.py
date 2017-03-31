@@ -2,6 +2,7 @@
 
 # Drives to crater from current position and aligns with the crater
 def go_to_crater_small(isYellow):
+	returnList = []
 
     # Go to the correct position
     if(isYellow == True):
@@ -12,6 +13,7 @@ def go_to_crater_small(isYellow):
 
 # Drives to the large crater a
 def go_to_large_crater_a(isYellow):
+	returnList = []
 	
 	# Go to correct position
 	if(isYellow == True):
@@ -22,6 +24,7 @@ def go_to_large_crater_a(isYellow):
 
 # Drives to the large crater b
 def go_to_large_crater_b(isYellow):
+	returnList = []
 	
 	# Go to correct position
 	if(isYellow == True):
@@ -32,6 +35,7 @@ def go_to_large_crater_b(isYellow):
 
 # Drives to the large crater c
 def go_to_large_crater_c(isYellow):
+	returnList = []
 	
 	# Go to correct position
 	if(isYellow == True):
@@ -44,7 +48,7 @@ def go_to_large_crater_c(isYellow):
 # Performs different moves depending on the crater to pick up from
 # Assumes the robot is near the crater
 def pick_up_balls(crater):
-	returnList.append(["start_drum()"])
+	returnList = ["start_drum()"]
     if crater is "A":
         returnList.append(["drive(150)"])
     elif crater is "B":
@@ -56,23 +60,18 @@ def pick_up_balls(crater):
 
 # Drives to the seasaw
 def go_to_seasaw(isYellow):
+	returnList = []
+	
 	if isYellow == true:
 		returnList.append(["go_to(150, 1930)"])
 	else:
 		returnList.append(["go_to(150, 1070)"])
-    pass
-
-# Go through seasaw
-def go_through_seasaw(isYellow):
-	if isYellow:
-        returnList.append(["front_seasaw_arm_down()", "drive(700)", "front_seasaw_arm_up()"])
-    else:
-        returnList.append(["back_seasaw_arm_down()", "drive(-700)", "back_seasaw_arm_up()"])
-	return returnList
+    return returnList
         
 # Unloads the balls in to the cargo bay net
 # Assumes: the robot is in front of the seasaw position
 def put_balls_in_net(isYellow):
+	returnList = []
 	if isYellow:
         returnList.append(["go_to(0, 335)"])
     else:

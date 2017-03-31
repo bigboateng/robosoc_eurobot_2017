@@ -2,50 +2,54 @@
 
 # Drive to the specified rocket cylinders
 def go_to_rocket(rocket, isYellow):
+    returnList = []
     if isYellow:
-		if rocket == "A":
-			returnList.append(["goTo(3000, 1350)"])
-		else:
-			returnList.append(["goTo(0, 1850)"])
-	else:
-		if rocket == "A":
-			returnList.append(["goTo(1350, 0)"])
-		else:
-			returnList.append(["goTo(0, 1150)"])
+        if rocket == "A":
+            returnList.append(["go_to", "rocket", "yellow", "A"])
+        else:
+            returnList.append(["go_to", "rocket", "yellow", "B"])
+    else:
+        if rocket == "A":
+            returnList.append(["go_to", "rocket", "blue", "A"])
+        else:
+            returnList.append(["go_to", "rocket", "blue", "B"])
+    return returnList
 
 # Picks up a single cylinder from the rocket
-# Assumes the grabber arm is down and the robot is in front of rocket
+# ASSUMPTION: grab_cylinder includes: arm_down, arm_open, drive to cylinder, arm_close
 def pick_up_rocket_cylinder():
-    returnList.append(["drive(150)", "grab_cylinder()", "drive(-150)", "grabber_arm_up()", "store_cylinder()", "grabber_arm_down()"])
+    return ["grab_cylinder", "grabber_arm_up", "store_cylinder", "grabber_arm_down"])
 
 # Goes to the specifies cylinder
 def go_to_stray_cylinder(cylinder, isYellow):
-	if isYellow:
-		if cylinder == "A":
-			returnList.append(["goTo(600, 2800)"])
-		elif cylinder == "B":
-			returnList.append(["goTo(1100, 2500)"])
-		elif cylinder == "C":
-			returnList.append(["goTo(1850, 2200)"])
-		elif cylinder == "D":
-			returnList.append(["goTo(1400, 2100)"])
-		elif cylinder == "E":
-			returnList.append(["goTo(600, 2000)"])
-		elif cylinder == "F":
-			returnList.append(["goTo(200, 2050)"])
-	else:
-		if cylinder == "A":
-			returnList.append(["goTo(200, 600)"])
-		elif cylinder == "B":
-			returnList.append(["goTo(1100, 500)"])
-		elif cylinder == "C":
-			returnList.append(["goTo(1850, 800)"])
-		elif cylinder == "D":
-			returnList.append(["goTo(1400, 900)"])
-		elif cylinder == "E":
-			returnList.append(["goTo(600, 1000)"])
-		elif cylinder == "F":
-			returnList.append(["goTo(200, 950)"])
+    returnList = []
+    if isYellow:
+        if cylinder == "A":
+            returnList.append(["go_to", "cylinder", "yellow", "A"])
+	elif cylinder == "B":
+            returnList.append(["go_to", "cylinder", "yellow", "B"])
+	elif cylinder == "C":
+            returnList.append(["go_to", "cylinder", "yellow", "C"])
+	elif cylinder == "D":
+            returnList.append(["go_to", "cylinder", "yellow", "D"])
+	elif cylinder == "E":
+            returnList.append(["go_to", "cylinder", "yellow", "E"])
+	elif cylinder == "F":
+            returnList.append(["go_to", "cylinder", "yellow", "F"])
+    else:
+        if cylinder == "A":
+            returnList.append(["go_to", "cylinder", "blue", "A"])
+	elif cylinder == "B":
+            returnList.append(["go_to", "cylinder", "blue", "B"])
+	elif cylinder == "C":
+            returnList.append(["go_to", "cylinder", "blue", "C"])
+	elif cylinder == "D":
+            returnList.append(["go_to", "cylinder", "blue", "D"])
+	elif cylinder == "E":
+            returnList.append(["go_to", "cylinder", "blue", "E"])
+	elif cylinder == "F":
+            returnList.append(["go_to", "cylinder", "blue", "F"])
+    return returnList
 	
 # Picks up a stray cylinder (i.e. not one in the rocket)
 # Assumes the grabber arm is down and the robot is in front of cylinder
