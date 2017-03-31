@@ -71,18 +71,32 @@ def start_stop_program(msg): # this will state the main state machine
 
 def doAction(actionAsString): # find what action to do and publish
     global arm_controller_pub, state, arm_state
-    if actionAsString == "armUp":
+    if actionAsString == "grabber_arm_up":
         arm_controller_pub.pub("up")
         state = States.WAITING_FOR_ACTION_FINISH
         arm_state = ArmState.BUSY
-    elif actionAsString == "armDown":
+    elif actionAsString == "grab_cylinder":
+        # includes: arm_down, arm_open, drive to cylinder, arm_close 
+    elif actionAsString == "grabber_arm_down":
         arm_controller_pub.pub("down")
         state = States.WAITING_FOR_ACTION_FINISH
         arm_state = ArmState.BUSY
-    elif actionAsString == "armOpen":
+    elif actionAsString == "store_cylinder":
         arm_controller_pub.pub("open")
         state = States.WAITING_FOR_ACTION_FINISH
         arm_state = ArmState.BUSY
+    elif actionAsString == "go_to":
+        # The next commands will be: object (e.g. cylinder), colour, letter
+    elif actionAsString == "drive":
+        # Drive a set distance which will be the next instruction, can be negative i.e. reverse
+    elif actionAsString == "place_cylinder":
+        # Drop the cylinder into moonbase
+    elif actionAsString == "rotation_arm_down":
+        # Arm to rotate the cylinder goes down (up is normal pos)
+    elif actionAsString == "rotate_cylinder":
+        # Check the light and rotate 1 cylinder until correct colour
+    elif actionAsString == "rotation_arm_up":
+        # Arm to rotate the cylinder goes up
     elif actionAsString == "armClose":
         arm_controller_pub.pub("close")
         state = States.WAITING_FOR_ACTION_FINISH

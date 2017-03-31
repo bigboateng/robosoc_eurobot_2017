@@ -73,6 +73,15 @@ class MapHelper():
         self.objects["net"]["blue"]["A"] = (25, 0, 270)
         self.objects["net"]["yellow"]["A"] = (275, 0, 270)
 
+        self.objects["moonbase"] = {}
+        self.objects["moonbase"]["blue"] = {}
+        self.objects["moonbase"]["blue"]["A"] = (90, 140, 315)
+        self.objects["moonbase"]["blue"]["B"] = (150, 120, 0)
+        
+        self.objects["moonbase"]["yellow"] = {}
+        self.objects["moonbase"]["yellow"]["A"] = (210, 140, 45)
+        self.objects["moonbase"]["yellow"]["B"] = (150, 120, 0)
+
         self.offset = {}
         self.offset["cylinder"] = (-5,15) # (centre_offset, dist_to_object)
         self.offset["rocket"] = (-5,22)
