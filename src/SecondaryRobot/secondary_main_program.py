@@ -42,7 +42,7 @@ my_map_loader = MapLoader(file_path = "./PythonAstar/300by200")
 my_map, array = my_map_loader.load_map(0)
 
 # Actions to be done
-global_actions = [MapHelper().get("smallcrater", "blue", "B"), States.PICK_UP_CYLINDER, States.PUT_DOWN_CYLINDER, States.GET_TO_CYLINDER]
+global_actions = [States.PICK_UP_CYLINDER, States.PUT_DOWN_CYLINDER, States.GET_TO_CYLINDER]
 state = States.CHOOSE_TASK
 global_path_instructions = [("drive", 40),("drive", 35) , ("bearing", -3.14)]
 #global_path_instructions = []
@@ -141,10 +141,10 @@ def initialize_node():
             if not len(global_path_instructions) == 0: # We need to move
                 move_action = global_path_instructions[0]
                 if move_action[0] == "drive":
-                    print("straight")
+                    print("straight", move_action)
                     motor_controller.resetEncoders()
-                    set_point_left = move_action[1]/100
-                    set_point_right = move_action[1]/100
+                    set_point_left = move_action[1]/100.0
+                    set_point_right = move_action[1]/100.0
                     leftPID.setPoint(set_point_left)
                     rightPID.setPoint(set_point_right)
                     left_complete = False
@@ -166,10 +166,12 @@ def initialize_node():
             else:
                 if not len(global_actions) == 0: # then are actions to do
                     action  = global_actions[0]
+                    print("action")
+                    del global_actions[0]
                     if type(action) == 'tuple' and len(action) == 3: # this is a target goal
                         end_goal_position = action[0]
                         state = States.GET_PATH
-                    elif type(action) == "str": # then its an action like pick up cylinder
+                    else:
                         state = action
                 else:
 					print("no instructions to do")
@@ -189,8 +191,8 @@ def initialize_node():
             elif arm_state == ArmState.COMPLETE: # has finished picking or dropping something
                 state == States.CHOOSE_TASK
         elif state == States.GO_TO_GOAL: # use PID to drive to target distance or turning
-            print("GO TO GOAL STATE")
             #print("Left Dist = {}, right Dist={}, Left error={}, right error={}".format(motor_controller.get_left_distance(), motor_controller.get_right_distance(), leftPID.getError(), rightPID.getError()))
+            print("STATE GO TO GOAL")
             left_speed = leftPID.update(motor_controller.get_left_distance())
             right_speed = rightPID.update(motor_controller.get_right_distance())
             if abs(leftPID.getError()) > 0.01:
@@ -211,6 +213,7 @@ def initialize_node():
             motor_controller.set_left_speed(128)
             time.sleep(1)
             print("STOP MOTOR ")
+            del global_path_instructions[0]
             state = States.CHOOSE_TASK
 
         elif state == States.EMERGENCY_STOP:
