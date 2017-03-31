@@ -91,10 +91,16 @@ class MD25 :
 
 
   def set_acceleration(self, accel):
-    self.i2c.write8(self.__MD25_ACCELERATION. accel)
+    self.i2c.write8(self.__MD25_ACCELERATION, accel)
   
   def forward(self, speed=100):
     self.i2c.write8(self.__MD25_SPEED_1, speed)
+    self.i2c.write8(self.__MD25_SPEED_2, speed)
+
+  def set_left_speed(self, speed):
+    self.i2c.write8(self.__MD25_SPEED_1, speed)
+
+  def set_right_speed(self, speed):
     self.i2c.write8(self.__MD25_SPEED_2, speed)
 
   def stop(self):
@@ -147,20 +153,23 @@ class MD25 :
     encoder2 = readEncoder(2)
     return encoder1, encoder2
 
+  def get_left_distance(self):
+    return self.readEncoder(type=1)*self.mul_count*-1
+
+  def get_right_distance(self):
+    return self.readEncoder(type=2)*self.mul_count*-1
 
   def updatePosition(self):
     # Updates x, y, theta 
-      rightDelta = -self.readEncoder(2)*self.mul_count
-      leftDelta = -(self.readEncoder(1)*self.mul_count)
-      #Update total values
-      self.lastReadingRight += rightDelta 
-      self.lastReadingLeft += leftDelta
-      if abs(leftDelta - rightDelta) < 1.0e-6:  # basically going straight
+      # rightDelta = -self.readEncoder(2)*self.mul_count
+      # leftDelta = -(self.readEncoder(1)*self.mul_count)
+      rightDelta = -self.readEncoder(2)*self.mul_count - self.lastReadingRight
+      leftDelta =  -self.readEncoder(1)*self.mul_count - self.lastReadingLeft
+      if abs(leftDelta - rightDelta) < 1e-6:  # basically going straight
         self.pos_x += leftDelta * cos(self.theta)
         self.pos_y += rightDelta * sin(self.theta)
-        self.resetEncoders()#print("Straight")
+        #self.resetEncoders()#print("Straight")
       else:
-  #print("Arc")
         R = self.robot.axle_length * (leftDelta + rightDelta) / (2 * (rightDelta - leftDelta))
         wd = (rightDelta - leftDelta) / (self.robot.axle_length/2)
         #R = self.robot.axle_length * (self.lastReadingLeft + self.lastReadingRight) / (2 * (self.lastReadingRight - self.lastReadingLeft))
@@ -168,8 +177,10 @@ class MD25 :
         self.pos_x += R * sin(wd + self.theta) - R * sin(self.theta)
         self.pos_y += R * cos(wd + self.theta) - R * cos(self.theta)
         self.theta = self.boundAngle(self.theta + wd)
-        self.resetEncoders()
-        print("Encoder L = {}, Encoder R = {}".format(self.readEncoder(1), self.readEncoder(2)))
+        #self.resetEncoders()
+        #print("Encoder L = {}, Encoder R = {}".format(self.readEncoder(1), self.readEncoder(2)))
+        self.lastReadingLeft = -self.readEncoder(2)*self.mul_count
+        self.lastReadingRight = -self.readEncoder(1)*self.mul_count
 
   def boundAngle(self, angle):
     while angle > pi:
