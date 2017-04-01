@@ -75,22 +75,31 @@ def doAction(actionAsString): # find what action to do and publish
         arm_controller_pub.pub("up")
         state = States.WAITING_FOR_ACTION_FINISH
         arm_state = ArmState.BUSY
-    elif actionAsString == "grab_cylinder":
-        # includes: arm_down, arm_open, drive to cylinder, arm_close 
     elif actionAsString == "grabber_arm_down":
         arm_controller_pub.pub("down")
         state = States.WAITING_FOR_ACTION_FINISH
         arm_state = ArmState.BUSY
-    elif actionAsString == "store_cylinder":
+    elif actionAsString == "grabber_arm_open":
         arm_controller_pub.pub("open")
         state = States.WAITING_FOR_ACTION_FINISH
         arm_state = ArmState.BUSY
+    elif actionAsString == "grabber_arm_close":
+        arm_controller_pub.pub("close")
+        state = States.WAITING_FOR_ACTION_FINISH
+        arm_state = ArmState.BUSY
+    elif actionAsString == "slowly_forward":
+        # Drive slowly forward 10cm
+    elif actionAsString == "slowly_backward":
+        # Drive slowly backward -10cm
+    elif actionAsString == "grabber_arm_default":
+        # Drive slowly forward 10cm
     elif actionAsString == "go_to":
         # The next commands will be: object (e.g. cylinder), colour, letter
     elif actionAsString == "drive":
         # Drive a set distance which will be the next instruction, can be negative i.e. reverse
     elif actionAsString == "place_cylinder":
-        # Drop the cylinder into moonbase
+        # Drop the cylinder into moonbase and move it forward
+        # Check cylinder can be placed and put in starting area if cannot
     elif actionAsString == "rotation_arm_down":
         # Arm to rotate the cylinder goes down (up is normal pos)
     elif actionAsString == "rotate_cylinder":
@@ -98,9 +107,6 @@ def doAction(actionAsString): # find what action to do and publish
     elif actionAsString == "rotation_arm_up":
         # Arm to rotate the cylinder goes up
     elif actionAsString == "armClose":
-        arm_controller_pub.pub("close")
-        state = States.WAITING_FOR_ACTION_FINISH
-        arm_state = ArmState.BUSY
     elif actionAsString == "holderRelease":
 	holder_controller_pub.pub("release")
     elif actionAsString == "holderReturn":
@@ -235,7 +241,7 @@ def initialize_node():
 	    	doAction("armOpen")
         	global_path_instructions = [("drive", 0.05)]
         elif state == States.PICK_UP_CYLINDER:
-			print("picking up cylinder")
+		print("picking up cylinder")
 	    	doAction("armClose")
 	    	doAction("armUp")
 	    	if cylinders <4:
@@ -249,8 +255,15 @@ def initialize_node():
 		    cylinders-= 1
             if(cylinders>2):
                 doAction("armOpen")
-
-        rate.sleep()
+          elif state == States.SLOWLY_FORWARD:
+              motor_controller.resetEncoders()
+              set_point_left = 0.1
+              set_point_right = 0.1
+              leftPID.setPoint(set_point_left)
+              rightPID.setPoint(set_point_right)
+              left_complete = False
+              right_comeplete = False
+          rate.sleep()
 
 
 if __name__ == "__main__":

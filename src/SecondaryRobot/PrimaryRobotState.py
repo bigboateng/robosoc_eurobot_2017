@@ -11,6 +11,7 @@ class States:
     GET_TO_CYLINDER = "get_to_cylinder"
     PICK_UP_CYLINDER = "pick_up_cylinder"
     PUT_DOWN_CYLINDER = "put_down_cylinder"
+    SLOWLY_FORWARD = "slowly_forward"
 
 class ArmState:
     BUSY = "Busy"
