@@ -1,5 +1,6 @@
 #!/usr/bin/env python
-
+import rospy
+from std_msgs.msg import String
 import time
 from os import sys, path
 sys.path.append('../UltrasonicSensors')
@@ -77,20 +78,20 @@ Stepper.setDir(rightStepper,-1)
 # Functions
 
 def getDistance_IRsensor():
-    	global IR_sensor_right
-    	global IR_sensor_left
-    	IR_sensor_right.getAnalogValue()
-    	IR_sensor_left.getAnalogValue()
-    	IR_sensor_right.distance # output this to ROS
-    	IR_sensor_left.distance # output this to ROS
+    global IR_sensor_right
+    global IR_sensor_left
+    IR_sensor_right.getAnalogValue()
+    IR_sensor_left.getAnalogValue()
+    IR_sensor_right.distance # output this to ROS
+    IR_sensor_left.distance # output this to ROS
 
 def getDistance_USsensor():
-    	global US_sensor_right
-    	global US_sensor_left
-    	US_sensor_right.readEcho(1)
-    	US_sensor_left.readEcho(1)
-    	US_sensor_right.echo[0] # output this to ROS
-    	US_sensor_left.echo[0] # output this to ROS
+    global US_sensor_right
+    global US_sensor_left
+    US_sensor_right.readEcho(1)
+    US_sensor_left.readEcho(1)
+	US_sensor_right.echo[0] # output this to ROS
+    US_sensor_left.echo[0] # output this to ROS
 
 def setSpeedESC(speed):
     	global esc
@@ -111,9 +112,9 @@ def liftUp():
 	global revo_tilt_1
 	global revo_tilt_2
 	Stepper.moveBoth_revo(revo_lift_1)
-    	Stepper.move_revo(motor_tilt, revo_tilt_1)
-    	Stepper.moveBoth_revo(revo_lift_2)
-    	Stepper.move_revo(motor_tilt, revo_tilt_2)
+    Stepper.move_revo(motor_tilt, revo_tilt_1)
+    Stepper.moveBoth_revo(revo_lift_2)
+    Stepper.move_revo(motor_tilt, revo_tilt_2)
 
 def liftDown():
 	global motor_tilt
@@ -121,11 +122,11 @@ def liftDown():
 	global revo_lift_2
 	global revo_tilt_1
 	global revo_tilt_2
-    	Stepper.reverseDirBoth()
-    	Stepper.moveBoth_revo(revo_lift_1)
-    	Stepper.moveBoth_revo(revo_lift_2)
-    	Stepper.move_revo(motor_tilt, revo_tilt_1)
-    	Stepper.move_revo(motor_tilt, revo_tilt_2)
+    Stepper.reverseDirBoth()
+    Stepper.moveBoth_revo(revo_lift_1)
+    Stepper.moveBoth_revo(revo_lift_2)
+    Stepper.move_revo(motor_tilt, revo_tilt_1)
+	Stepper.move_revo(motor_tilt, revo_tilt_2)
 
 def liftSequence(sleep_time=2):
 	global motor_tilt
@@ -134,16 +135,38 @@ def liftSequence(sleep_time=2):
 	global revo_tilt_1
 	global revo_tilt_2
 	Stepper.moveBoth_revo(revo_lift_1)
-    	Stepper.move_revo(motor_tilt, revo_tilt_1)
-    	Stepper.moveBoth_revo(revo_lift_2)
-    	Stepper.move_revo(motor_tilt, revo_tilt_2)
-    	time.sleep(sleep_time)
-    	Stepper.reverseDirBoth()
-    	Stepper.moveBoth_revo(revo_lift_1)
-    	Stepper.moveBoth_revo(revo_lift_2)
-    	Stepper.move_revo(motor_tilt, revo_tilt_1)
-    	Stepper.move_revo(motor_tilt, revo_tilt_2)
+    Stepper.move_revo(motor_tilt, revo_tilt_1)
+    Stepper.moveBoth_revo(revo_lift_2)
+    Stepper.move_revo(motor_tilt, revo_tilt_2)
+    time.sleep(sleep_time)
+    Stepper.reverseDirBoth()
+    Stepper.moveBoth_revo(revo_lift_1)
+    Stepper.moveBoth_revo(revo_lift_2)
+    Stepper.move_revo(motor_tilt, revo_tilt_1)
+    Stepper.move_revo(motor_tilt, revo_tilt_2)
+
+def onMessageReceived(msg):
+    action = msg.data
+    if action == "setSide":
+        side = 
+    if action == "ballGrabberOn":
+        setBallGrabberOn()
+    elif action == "ballGrabberOff":
+        setBallGrabberOff()
+    elif action == "liftUp"
+        liftUp()
+    elif action == "liftDown":
+        liftDown()
 
 
+def onSetSide(msg):
+    global side
+    side = msg.data
 
+def init_node():
+    rospy.init_node("roller_node")
+    sub = rospy.Subscriber("primary_functions", String, onMessageReceived)
+    side_sub = rospy.Subscriber("primary_functions/setSide", String, onSetSide)
+    while not rospy.is_shutdown():
+        rospy.spin()
 

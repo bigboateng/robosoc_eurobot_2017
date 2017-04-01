@@ -126,6 +126,7 @@ def updatePos(data):
 
 def initialize_node():
     global state, global_actions, arm_state, global_path_instructions, set_point_left, set_point_right, leftPID, rightPID
+    global position
     end_goal_position = (95,20,0)
     rospy.init_node("primary_robot_node") # Initialize the ros node
     rate = rospy.Rate(refresh_rate) # refresh rate
@@ -189,10 +190,9 @@ def initialize_node():
         elif state == States.GET_PATH:
             print("State = GET PATH")
             end_position = global_actions[0]
-            print((currentPosX, currentPosY))
             print( (end_position[0],end_position[1]))
             print(end_position[2])
-            global_path_instructions = my_map.get_instructions((currentPosX, currentPosY), (end_position[0],end_position[1]), end_position[2])
+            global_path_instructions = my_map.get_instructions((position[0], position[1]), (end_position[0],end_position[1]), end_position[2])
             print(global_path_instructions)
             state = States.GO_TO_GOAL
         elif state == States.WAITING_FOR_ACTION_FINISH:
