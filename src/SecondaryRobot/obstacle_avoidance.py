@@ -5,8 +5,12 @@ This code will alert main program if robot is near obstacle/wall
 """
 import rospy
 from std_msgs.msg import String
-from ..Sensors.SRF08 import SRF08
-
+from os import sys, path
+sys.path.append('../UltrasonicSensors')
+from SRF08 import SRF08
+sys.path.append('../IRSensors')
+from IRsensor import IRsensor
+import time
 
 def initialize_node():
     """
@@ -18,28 +22,28 @@ def initialize_node():
     # How fast to check for obstacles per second
     refresh_rate = 10 #Hz
     rate = rospy.Rate(refresh_rate)
-    # Initialize the 3 sensors
-    sensor_front_left = SRF08()
-    sensor_front_right = SRF08()
-    sensor_back = SRF08() # todo(boateng): this is IR!
+    # SPI/IR Sensor
+    SPI_PORT   = 0
+    SPI_DEVICE = 0
+    channel_mcp_IR_sensor_back = 0 # backward sensor 
+    IR_sensor_back = IRsensor(SPI_PORT, SPI_DEVICE, channel_mcp_IR_sensor_back)
+    # Initialize the Ultrasonic sensor
+    address_i2c_US_sensor_front = 0xE0 >> 1
+    US_sensor_front = SRF08(address_i2c_US_sensor_front, 2)
 
-    sensor_threshold = 0.1
+
+    ut_threshold = 0.1
     ir_threshold = 0.1
 
-    collision_sensors = []
+    alert_message = ""
     while not rospy.is_shutdown():
-        if sensor_front_left.get_distance() > sensor_threshold:
-            collision_sensors.append("front_left")
-
-        if sensor_front_right.get_distance() > sensor_threshold:
-            collision_sensors.append("front_right")
-
-        if sensor_back.get_distance() > sensor_threshold:
-            collision_sensors.append("back")
-
-        if len(collision_sensors) > 0:
-            obstacle_alert.publish(collision_sensors)
-
+        IR_sensor_back.getAnalogValue()
+        if IR_sensor_back.distance > ir_threshold:
+            alert_message = "front"
+            obstacle_alert.publish(alert_message)
+        if sensor_back.US_sensor_front() > ut_threshold:
+            alert_message = "back"
+            obstacle_alert.publish(alert_message)
         rate.sleep()
 
 
