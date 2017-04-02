@@ -21,3 +21,7 @@ class ArmState:
 class ActionTypes:
     GO_TO = "go_to"
     ACTION = "action"
+
+class BumperType:
+    MOON_BASE_BUMPER = "moon_base_bumper"
+    GRABBER_BUMPER = "grabber_bumper"

@@ -1,0 +1,4 @@
+<launch>
+<node name="bumper_listener.py" pkg="master_robot" type="bumper_listener.py"/>
+<!--<node name="secondary_main.py" pkg="master_robot" type="secondary_main.py" output="screen"/> -->
+</launch>

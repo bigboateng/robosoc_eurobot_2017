@@ -164,7 +164,7 @@ def updatePos(data):
 
 def bump_detected(msg):
     global state
-    if msg.data == "grabber_bump": # we hit a cylinder, grab it
+    if msg.data == BumperType.GRABBER_BUMPER: # we hit a cylinder, grab it
         state = States.STOP_MOTORS
     elif msg.data == "moon_base_bump": # we hit the moonbase bump
         pass
@@ -181,7 +181,7 @@ def initialize_node():
     # Subscribers
     rospy.Subscriber("start_stop_program", String, start_stop_program)
     rospy.Subscriber("arm_action_complete", String, action_complete)
-    rospy.Subscriber("bumper_nodes", String, bump_detected)
+    rospy.Subscriber("bumper_topic", String, bump_detected)
     #Subscribing to ros localization
     rospy.Subscriber("odomtery/filtered", Odometry, updatePos)
     # left and right wheel PID
