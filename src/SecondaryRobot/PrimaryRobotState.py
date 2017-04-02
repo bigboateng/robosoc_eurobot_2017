@@ -8,6 +8,7 @@ class States:
     EMERGENCY_STOP = "emergency_stop"
     WAITING_FOR_ACTION_FINISH = "waiting for action to be done"
     GO_TO_GOAL = "go to goal state"
+    GO_TO_GOAL_SLOWLY = "go to goal slowly"
     GET_TO_CYLINDER = "get_to_cylinder"
     PICK_UP_CYLINDER = "pick_up_cylinder"
     PUT_DOWN_CYLINDER = "put_down_cylinder"
@@ -16,3 +17,7 @@ class States:
 class ArmState:
     BUSY = "Busy"
     COMPLETE = "Complete"
+
+class ActionTypes:
+    GO_TO = "go_to"
+    ACTION = "action"
