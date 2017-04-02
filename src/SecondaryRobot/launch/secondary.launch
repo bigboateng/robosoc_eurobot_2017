@@ -1,4 +1,5 @@
 <launch>
-<node name="bumper_listener.py" pkg="master_robot" type="bumper_listener.py"/>
-<!--<node name="secondary_main.py" pkg="master_robot" type="secondary_main.py" output="screen"/> -->
+<node name="my_bumper" pkg="master_robot" type="my_bumper.py"/>
+<!--<node name="arm_controller" pkg="master_robot" type="arm_control.py"/> -->
+<node name="secondary_main" pkg="master_robot" type="secondary_main.py"/>
 </launch>

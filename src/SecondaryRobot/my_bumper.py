@@ -21,6 +21,7 @@ def init_node():
 	moon_base_bumper = Bumper(pins, "PULL_DOWN")
 	# publisher to alert when bumper is pressed
 	bumper_pub = rospy.Publisher("bumper_topic", String, queue_size=10)
+	rospy.loginfo("Beginning node")
 	while not rospy.is_shutdown():
 		rospy.loginfo("Working")
 		if grabber_bumber.isPressed():

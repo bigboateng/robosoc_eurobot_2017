@@ -2,8 +2,7 @@
 import rospy
 from std_msgs.msg import String
 from os import sys, path
-sys.path.append('../ServoMotor')
-import Servo
+from libs import Servo
 import time
 
 # main servo (HX12K)
@@ -96,7 +95,7 @@ def listener():
     # spin() simply keeps python from exiting until this node is stopped
     rospy.spin()
 
-if __name__ == '__main__' and __package__ is None:
+if __name__ == '__main__':
     try:
         listener()
     except ROSInterruptException:

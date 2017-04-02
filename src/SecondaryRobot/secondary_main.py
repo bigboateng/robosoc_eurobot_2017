@@ -21,7 +21,7 @@ primary_robot = Robot.Robot(axle_length=0.10265,wheel_diameter=0.097)
 # control motors
 motor_controller = MD25(address=0x58, robot=primary_robot)
 motor_controller.resetEncoders()
-motor_controller.set_acceleration(1)
+motor_controller.set_acceleration(2)
 
 # starting state = wait for start button
 state = States.WAIT_FOR_START_BUTTON
@@ -104,7 +104,7 @@ def turn(bearing):
                                                                         motor_controller.get_left_distance(),
                                                                         motor_controller.get_right_distance()))
 def doAction(actionAsString): # find what action to do and talk to the node
-    global arm_controller_pub, state, arm_state
+    global arm_controller_pub, state, arm_state, motor_controller, leftPID, rightPID, left_wheel_movement_complete, right_wheel_movement_complete
     if actionAsString == "grabber_arm_up":
         arm_controller_pub.pub("up")
         arm_state = ArmState.BUSY
@@ -125,7 +125,6 @@ def doAction(actionAsString): # find what action to do and talk to the node
         state = States.SLOWLY_FORWARD
     elif actionAsString == "slowly_backward":
         # Drive slowly backward -10cm
-        global state, motor_controller, leftPID, rightPID, left_wheel_movement_complete, right_wheel_movement_complete
         motor_controller.resetEncoders()
         set_point_left = -10 / 100  # Set the left wheel PID, convert the distance to meters
         set_point_right = -10 / 100  # Set the left wheel PID, convert the distance to meters
