@@ -23,5 +23,6 @@ class ActionTypes:
     ACTION = "action"
 
 class BumperType:
+    START_BUMPER = "start bumper"
     MOON_BASE_BUMPER = "moon_base_bumper"
     GRABBER_BUMPER = "grabber_bumper"

@@ -167,6 +167,8 @@ def bump_detected(msg):
         state = States.STOP_MOTORS
     elif msg.data == "moon_base_bump": # we hit the moonbase bump
         pass
+    elif msg.data = BumperType.START_BUMPER: # Start main start_stop_program
+        state = States.CHOOSE_TASK
 
 def initialize_node():
     global state, global_actions, arm_state, global_path_instructions, set_point_left, set_point_right, leftPID,\
@@ -178,7 +180,6 @@ def initialize_node():
     arm_controller_pub = rospy.Publisher("arm_controller", String, queue_size=10)
     holder_controller_pub = rospy.Publisher("holder", String, queue_size=10)
     # Subscribers
-    rospy.Subscriber("start_stop_program", String, start_stop_program)
     rospy.Subscriber("arm_action_complete", String, action_complete)
     rospy.Subscriber("bumper_topic", String, bump_detected)
     #Subscribing to ros localization

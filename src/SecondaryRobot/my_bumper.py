@@ -19,6 +19,7 @@ def init_node():
 	pins = [24,7]
 	grabber_bumber = Bumper([8], "PULL_DOWN")
 	moon_base_bumper = Bumper(pins, "PULL_DOWN")
+	start_button_bumber = Bumber([4], "PULL_UP")
 	# publisher to alert when bumper is pressed
 	bumper_pub = rospy.Publisher("bumper_topic", String, queue_size=10)
 	rospy.loginfo("Beginning node")
@@ -31,6 +32,9 @@ def init_node():
 
 		if moon_base_bumper.isPressed():
 			bumber_pub.publish(BumperType.MOON_BASE_BUMPER)
+
+		if start_button_bumber.isPressed():
+			bumper_pub.publish(BumperType.START_BUMPER)
 		rate.sleep()
 
 
