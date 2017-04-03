@@ -8,7 +8,7 @@ from Bumper import Bumper
 from PrimaryRobotState import BumperType
 
 
-refresh_rate = 1 # 10 times a second
+refresh_rate = 10 # 10 times a second
 
 
 def init_node():
@@ -16,25 +16,25 @@ def init_node():
 	rospy.init_node("bumperr", anonymous=True)
 	rate = rospy.Rate(refresh_rate)
 	# Bumper pins
-	pins = [24,7]
-	grabber_bumber = Bumper([8], "PULL_DOWN")
+	pins = [17,27]
+	grabber_bumber = Bumper([22], "PULL_DOWN")
 	moon_base_bumper = Bumper(pins, "PULL_DOWN")
-	start_button_bumber = Bumber([4], "PULL_UP")
+	start_button_bumber = Bumper([4], "PULL_UP")
 	# publisher to alert when bumper is pressed
 	bumper_pub = rospy.Publisher("bumper_topic", String, queue_size=10)
 	rospy.loginfo("Beginning node")
 	while not rospy.is_shutdown():
-		rospy.loginfo("Working")
 		if grabber_bumber.isPressed():
-			bumber_pub.publish(BumperType.GRABBER_BUMPER)
-		else:
-			rospy.loginfo("grabber_bumper NOT pressed")
+			bumper_pub.publish(BumperType.GRABBER_BUMPER)
+			rospy.loginfo("GRABBER BUMPER PRESSED")
 
 		if moon_base_bumper.isPressed():
-			bumber_pub.publish(BumperType.MOON_BASE_BUMPER)
+			rospy.loginfo("BOTTOM PRESSED")
+			bumper_pub.publish(BumperType.MOON_BASE_BUMPER)
 
-		if start_button_bumber.isPressed():
-			bumper_pub.publish(BumperType.START_BUMPER)
+		# if start_button_bumber.isPressed():
+		# 	pass
+		# 	bumper_pub.publish(BumperType.START_BUMPER)
 		rate.sleep()
 
 

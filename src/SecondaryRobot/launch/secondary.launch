@@ -1,5 +1,6 @@
 <launch>
 <node name="my_bumper" pkg="master_robot" type="my_bumper.py"/>
-<!--<node name="arm_controller" pkg="master_robot" type="arm_control.py"/> -->
-<node name="secondary_main" pkg="master_robot" type="secondary_main.py"/>
+<node name="arm_controller" pkg="master_robot" type="arm_control.py"/> 
+<!-- <node name="lcd_node" pkg="master_robot" type="lcd_node.py "/> -->
+<!-- <node name="secondary_main" pkg="master_robot" type="secondary_main.py"/> -->
 </launch>
