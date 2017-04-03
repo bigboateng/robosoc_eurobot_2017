@@ -1,5 +1,7 @@
 # -- Secondary --
 
+drop_cylinders = []
+
 # Drive to the specified rocket cylinders
 def go_to_rocket(rocket, isYellow):
     returnList = []
@@ -48,16 +50,33 @@ def go_to_stray_cylinder(cylinder, isYellow):
 	
 # Picks up a stray cylinder (i.e. not one in the rocket)
 # Assumes the grabber arm is down and the robot is in front of cylinder
-def pick_up_cylinder():
+def pick_up_cylinder(needRotating):
+    if needRotating:
+        drop_cylinders.extend([[["action","rotation_arm_down"],
+                               ["action","rotate_cylinder"],
+                               ["action","rotation_arm_up"],
+                               ["action", "place_cylinder"]]])
+    else:
+        drop_cylinders.append([["action", "place_cylinder"]])
     return [["action", "grabber_arm_down"], ["action", "grabber_arm_open"],
             ["action", "slowly_forward"], ["action", "grabber_arm_close"],
-            ["action", "grabber_arm_up"], ["action", "grabber_arm_open"],
-            ["action", "grabber_arm_default"]]
+            ["action", "slowly_backward"], ["action", "grabber_arm_up"],
+            ["action", "grabber_arm_open"], ["action", "grabber_arm_default"]]
 
-def pick_up_last_cylinder():
+def pick_up_last_cylinder(needRotating):
+    if needRotating:
+        drop_cylinders.extend([[["action","rotation_arm_down"],
+                               ["action","rotate_cylinder"],
+                               ["action","rotation_arm_up"],
+                               ["action", "place_cylinder"]]])
+    else:
+        drop_cylinders.append([["action", "place_cylinder"]])
     return [["action", "grabber_arm_down"], ["action", "grabber_arm_open"],
             ["action", "slowly_forward"], ["action", "grabber_arm_close"],
-            ["action","grabber_arm_up"]]
+            ["action", "slowly_backward"], ["action","grabber_arm_up"]]
+
+def drop_cylinder():
+    return drop_cylinders.pop(0)
 
 # Drive to the specifies moonbase and align with the slot
 def go_to_moonbase(moonbase, isYellow):
@@ -65,36 +84,11 @@ def go_to_moonbase(moonbase, isYellow):
     if isYellow:
         if moonbase == "A":
             returnList.append(["go_to", "moonbase", "yellow", "A"])
-	elif moonbase == "B":
-            returnList.append(["go_to", "moonbase", "yellow", "B"])
 	else:
-            returnList.append(["go_to", "moonbase", "yellow", "C"])
+            returnList.append(["go_to", "moonbase", "yellow", "B"])
     else:
         if moonbase == "A":
             returnList.append(["go_to", "moonbase", "yellow", "A"])
-	elif moonbase == "B":
-            returnList.append(["go_to", "moonbase", "yellow", "B"])
 	else:
-            returnList.append(["go_to", "moonbase", "yellow", "C"])
-    return returnList
-
-# Places all cylinders in the moonbase slot
-# Assumes over the slot
-def place_cylinders_in_slot(no_of_cylinders):
-    returnList = []
-    while no_of_cylinders > 0:
-        returnList.append(["action", "place_cylinder"])
-        no_of_cylinders -= 1
-    return returnList
-
-# Rotates the cylinder until colour is facing the right way up.
-# Assumes the robot is on the side of the moonbase
-# Assumes rotation arm is up, in natural position
-def rotate_cylinders_in_slot():
-    returnList = [["drive", "72"]]
-    for i in range(6): # 6 is the max number of cylinders that fit in the middle slot
-        returnList.extend([["action","rotation_arm_down"], ["action","rotate_cylinder"],
-                           ["action","rotation_arm_up"]])
-        if i != 5:
-            returnList.append(["drive", "-12"])
+            returnList.append(["go_to", "moonbase", "yellow", "B"])
     return returnList

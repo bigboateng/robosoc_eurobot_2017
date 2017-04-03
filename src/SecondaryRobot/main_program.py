@@ -99,6 +99,7 @@ def doAction(actionAsString): # find what action to do and publish
         # Drive a set distance which will be the next instruction, can be negative i.e. reverse
     elif actionAsString == "place_cylinder":
         # Drop the cylinder into moonbase and move it forward
+        # Rotate cylinder if necessary
         # Check cylinder can be placed and put in starting area if cannot
     elif actionAsString == "rotation_arm_down":
         # Arm to rotate the cylinder goes down (up is normal pos)
