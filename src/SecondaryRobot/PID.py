@@ -15,7 +15,7 @@ class PID:
         self.set_point=0.0
         self.error=0.0
 
-    def update(self,current_value):
+    def update(self,current_value, min_speed=0, max_speed=225):
         """
         Calculate PID output value for given reference input and feedback
         """
@@ -37,7 +37,7 @@ class PID:
 
         PID = self.P_value + self.I_value + self.D_value
 
-        return int(self.limit_speed(PID, 0, 225))
+        return int(self.limit_speed(PID, 0, max_speed))
 
     def setPoint(self,set_point):
         """

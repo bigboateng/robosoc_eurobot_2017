@@ -23,31 +23,31 @@ def go_to_stray_cylinder(cylinder, isYellow):
     if isYellow:
         if cylinder == "A":
             returnList.append(["go_to", "cylinder", "yellow", "A"])
-	elif cylinder == "B":
+        elif cylinder == "B":
             returnList.append(["go_to", "cylinder", "yellow", "B"])
-	elif cylinder == "C":
+        elif cylinder == "C":
             returnList.append(["go_to", "cylinder", "yellow", "C"])
-	elif cylinder == "D":
+        elif cylinder == "D":
             returnList.append(["go_to", "cylinder", "yellow", "D"])
-	elif cylinder == "E":
+        elif cylinder == "E":
             returnList.append(["go_to", "cylinder", "yellow", "E"])
-	elif cylinder == "F":
+        elif cylinder == "F":
             returnList.append(["go_to", "cylinder", "yellow", "F"])
     else:
         if cylinder == "A":
             returnList.append(["go_to", "cylinder", "blue", "A"])
-	elif cylinder == "B":
+        elif cylinder == "B":
             returnList.append(["go_to", "cylinder", "blue", "B"])
-	elif cylinder == "C":
+        elif cylinder == "C":
             returnList.append(["go_to", "cylinder", "blue", "C"])
-	elif cylinder == "D":
+        elif cylinder == "D":
             returnList.append(["go_to", "cylinder", "blue", "D"])
-	elif cylinder == "E":
+        elif cylinder == "E":
             returnList.append(["go_to", "cylinder", "blue", "E"])
-	elif cylinder == "F":
+        elif cylinder == "F":
             returnList.append(["go_to", "cylinder", "blue", "F"])
     return returnList
-	
+    
 # Picks up a stray cylinder (i.e. not one in the rocket)
 # Assumes the grabber arm is down and the robot is in front of cylinder
 def pick_up_cylinder(needRotating):
@@ -61,7 +61,7 @@ def pick_up_cylinder(needRotating):
     return [["action", "grabber_arm_down"], ["action", "grabber_arm_open"],
             ["action", "slowly_forward"], ["action", "grabber_arm_close"],
             ["action", "slowly_backward"], ["action", "grabber_arm_up"],
-            ["action", "grabber_arm_open"], ["action", "grabber_arm_default"]]
+            ["action", "grabber_arm_open_fully"]]
 
 def pick_up_last_cylinder(needRotating):
     if needRotating:
@@ -84,11 +84,11 @@ def go_to_moonbase(moonbase, isYellow):
     if isYellow:
         if moonbase == "A":
             returnList.append(["go_to", "moonbase", "yellow", "A"])
-	else:
+        else:
             returnList.append(["go_to", "moonbase", "yellow", "B"])
     else:
         if moonbase == "A":
             returnList.append(["go_to", "moonbase", "yellow", "A"])
-	else:
+        else:
             returnList.append(["go_to", "moonbase", "yellow", "B"])
     return returnList

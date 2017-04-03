@@ -17,5 +17,4 @@ def get_list(isYellow):
     returnList.extend(high_level_secondary.drop_cylinders_in_moonbase(isYellow))
     return returnList
 
-def return_list(isYellow):
-    return get_list(True)
+print get_list(True)
