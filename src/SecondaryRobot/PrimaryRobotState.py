@@ -13,7 +13,11 @@ class States:
     PICK_UP_CYLINDER = "pick_up_cylinder"
     PUT_DOWN_CYLINDER = "put_down_cylinder"
     SLOWLY_FORWARD = "slowly_forward"
-
+    TURN_RIGHT = "turning right"
+    TURN_LEFT = "turning left"
+    ERROR_CORRECT = "error_correct_state"
+    DRIVE_FORWARD = "drive forwards"
+    
 class ArmState:
     BUSY = "Busy"
     COMPLETE = "Complete"
