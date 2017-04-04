@@ -17,7 +17,7 @@ import rospy
 from nav_msgs.msg import Odometry
 
 # object to hold robot parameters
-primary_robot = Robot.Robot(axle_length=0.18,wheel_diameter=0.097)
+primary_robot = Robot.Robot(axle_length=0.185,wheel_diameter=0.097)
 # control motors
 motor_controller = MD25(address=0x59, robot=primary_robot)
 motor_controller.resetEncoders()
@@ -51,7 +51,7 @@ my_map, array = None, None #my_map_loader.load_map(0)
 #global_actions = [[],["action", "slowly_backward"]]
 #global_path_instructions = [['drive', 0.9], ['rotate', 90], ['drive', 44], ['rotate', 90]]
 global_actions=[]
-global_path_instructions = [['rotate', 90]]
+global_path_instructions = [['rotate', 180]]
 #global_path_instructions=[]
 
 # robots current position
@@ -230,6 +230,7 @@ def initialize_node():
     right_wheel_movement_complete = False # Whether the right wheel has moved the set distance
     errorL = 0
     errorR = 0
+    averagedError = 0
     while not rospy.is_shutdown():
         """
         This is the main state machine, add new states in the StateMachine class.
@@ -305,17 +306,28 @@ def initialize_node():
             if left_wheel_movement_complete and right_wheel_movement_complete:
                 state = States.STOP_MOTORS
         elif state == States.DRIVE_FORWARD:
-            if (motor_controller.get_left_distance() + motor_controller.get_right_distance()) / 2 < set_point_left:
-                    motor_controller.set_left_speed(66)
-                    motor_controller.set_right_speed(66)
+            if (motor_controller.get_left_distance() + motor_controller.get_right_distance()) / 2 < set_point_left-0.2:
+                    motor_controller.set_left_speed(80)
+                    motor_controller.set_right_speed(80)
+
             else:
+                motor_controller.set_acceleration(7)
                 motor_controller.stop()
-                state = States.STOP_MOTORS
+                time.sleep(0.3)
+                print("actualLEFT = {}, actualright={}, set_point_left={}".format(motor_controller.get_left_distance(), motor_controller.get_right_distance(), set_point_left))
+                averagedDistance = (motor_controller.get_left_distance() + motor_controller.get_right_distance()) / 2
+                averagedError = averagedDistance - set_point_left
+                print("averagederror={}".format(averagedError))
+                motor_controller.resetEncoders()
+                state = States.ERROR_CORRECT
+
+
         elif state ==  States.TURN_LEFT:
             if motor_controller.get_left_distance() < set_point_left:
-                    motor_controller.set_left_speed(108)
-                    motor_controller.set_right_speed(148)
+                    motor_controller.set_left_speed(100)
+                    motor_controller.set_right_speed(156)
             else:
+                motor_controller.set_acceleration(7)
                 motor_controller.stop()
                 time.sleep(0.3)
                 print("LEFT={}, right={},actualLeft={}. actualRight={}".format(set_point_left, set_point_right, motor_controller.get_left_distance(), motor_controller.get_right_distance()))
@@ -324,6 +336,7 @@ def initialize_node():
                 print("LEFT DIST={}, errorL={}".format(motor_controller.get_left_distance(), errorL))
                 motor_controller.resetEncoders()
                 state = States.ERROR_CORRECT
+
         elif state == States.ERROR_CORRECT:
             print("ERROR CORRRECRT ENTER")
             if (errorL > 0):
@@ -331,8 +344,27 @@ def initialize_node():
                 if -(motor_controller.get_left_distance()) < errorL:
                     motor_controller.set_left_speed(138)
                     motor_controller.set_right_speed(118)
+                    print("distanceaftercorrection={}, initialerror={}".format(-(motor_controller.get_left_distance()), errorL))
                 else:
                     state = States.STOP_MOTORS
+
+            if (averagedError > 0):
+                print("averagedError={}".format(averagedError))
+                if -(motor_controller.get_left_distance()) < averagedError:
+                    motor_controller.set_left_speed(140)
+                    motor_controller.set_right_speed(140)
+                else:
+                    state= States.STOP_MOTORS
+
+            if (averagedError < 0):
+                print("averageCorrect")
+                if abs(motor_controller.get_left_distance()) <  abs(averagedError):
+                    print("go back")
+                    motor_controller.set_left_speed(120)
+                    motor_controller.set_right_speed(120)
+                else:
+                    state= States.STOP_MOTORS
+
         elif state == States.TURN_RIGHT:
             if motor_controller.get_left_distance() > set_point_left:
                     motor_controller.set_left_speed(138)
@@ -340,6 +372,7 @@ def initialize_node():
             else:
                  print("LEFT={}, right={},actualLeft={}. actualRight={}".format(set_point_left, set_point_right, motor_controller.get_left_distance(), motor_controller.get_right_distance()))
                  state = States.ERROR_CORRECT
+
         elif state == States.STOP_MOTORS:  # stop the motors
             motor_controller.stop()
             time.sleep(0.3)
