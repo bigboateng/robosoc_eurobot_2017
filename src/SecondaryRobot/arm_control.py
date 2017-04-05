@@ -18,8 +18,8 @@ grabber_servo.setMaxAngle(180)
 # Release Servo
 # Servo blocking cylinders (SO5NF STD)
 servo_cyl = Servo.Servo(0x40, 2, 50)
-servo_cyl.setPulseLengthMin(550)
-servo_cyl.setPulseLengthMax(2450)
+servo_cyl.setPulseLengthMin(500)
+servo_cyl.setPulseLengthMax(2500)
 servo_cyl.setMaxAngle(180)
 
 
@@ -76,12 +76,16 @@ def defaultPosition():
 
 #TODO finish holder functions with actual python code
 def holderRelease():
-    print "Angle: -90 deg."
-    servo_cyl.setAngle(-90)
-    time.sleep(2)
     print "Angle: 35 deg."
-    servo_cyl.setAngle(35)
-    time.sleep(1)
+    servo_cyl.setAngle(25)
+    time.sleep(0.5)
+    send_action_complete()
+
+def holderDefault():
+    print "Angle: 90 deg."
+    servo_cyl.setAngle(90)
+    time.sleep(2)
+    send_action_complete()
 
 
 def armControl(data):
@@ -98,8 +102,10 @@ def armControl(data):
         grabberOpenFully()
     elif(data.data=="default"):
         defaultPosition()
-    elif data.data == "release_cylinder":
+    elif data.data == "holder_release":
         holderRelease()
+    elif data.data == "holder_default":
+        holderDefault()
     else:
         rospy.loginfo("wrong message")
     

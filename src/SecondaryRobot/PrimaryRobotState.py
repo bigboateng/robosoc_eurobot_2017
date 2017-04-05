@@ -17,6 +17,7 @@ class States:
     TURN_LEFT = "turning left"
     ERROR_CORRECT = "error_correct_state"
     DRIVE_FORWARD = "drive forwards"
+    DRIVE_BACKWARD = "drive backwards"
     
 class ArmState:
     BUSY = "Busy"

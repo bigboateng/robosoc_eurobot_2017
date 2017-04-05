@@ -4,8 +4,8 @@ import rospy
 from os import sys, path
 
 sys.path.insert(0, "/MD25") #map_loader.MapLoader
-#from PythonAstar.map_loader import MapLoader
-#from PythonAstar.map_helper import MapHelper
+from PythonAstar.map_loader import MapLoader
+from PythonAstar.map_helper import MapHelper
 from MD25 import MD25
 import Robot
 from std_msgs.msg import String
@@ -17,7 +17,7 @@ import rospy
 from nav_msgs.msg import Odometry
 
 # object to hold robot parameters
-primary_robot = Robot.Robot(axle_length=0.181,wheel_diameter=0.097)
+primary_robot = Robot.Robot(axle_length=0.185,wheel_diameter=0.097)
 # control motors
 motor_controller = MD25(address=0x59, robot=primary_robot)
 motor_controller.resetEncoders()
@@ -29,10 +29,6 @@ state = States.CHOOSE_TASK
 #state = States.CHOOSE_TASK
 prev_state = state
 
-
-# error 
-errorL = 0.0
-errorR = 0.0
 # number of cylinders that robot carry
 cylinders = 0
 
@@ -42,11 +38,11 @@ position = [0.0,0.0,0.0]
 # state of robotic arm
 arm_state = ArmState.COMPLETE
 # refresh rate of program
-refresh_rate = 40 # 50 Hz
+refresh_rate = 50 # 50 Hz
 
 #configure A*
 my_map_loader = None #MapLoader(file_path = "./PythonAstar/300by200")
-my_map, array = None, None#my_map_loader.load_map(0)
+my_map, array = None, None #my_map_loader.load_map(0)
 
 # Actions to be done
 #global_actions = [["action", "del"], ["action", "grabber_arm_close"], ["action", "grabber_arm_down"], ["action", "grabber_arm_open"]]#, ["action", "grabber_arm_close"], ["action", "grabber_arm_up"], ["action", "grabber_arm_open"]]
@@ -54,19 +50,21 @@ my_map, array = None, None#my_map_loader.load_map(0)
 #global_actions = [[], ['action', 'grabber_arm_down'], ['action', 'grabber_arm_open'], ['action', 'slowly_forward'], ['action', 'grabber_arm_close'], ['action', 'slowly_backward'], ['action', 'grabber_arm_up'], ['action', 'grabber_arm_open_fully'], ['action', 'grabber_arm_default'], ['action', 'grabber_arm_down'], ['action', 'grabber_arm_open'], ['action', 'slowly_forward'], ['action', 'grabber_arm_close'], ['action', 'slowly_backward'], ['action', 'grabber_arm_up'], ['action', 'grabber_arm_open_fully'], ['action', 'grabber_arm_default'], ['action', 'grabber_arm_down'], ['action', 'grabber_arm_open'], ['action', 'slowly_forward'], ['action', 'grabber_arm_close'], ['action', 'slowly_backward'], ['action', 'grabber_arm_up'], ['action', 'grabber_arm_open_fully'], ['action', 'grabber_arm_default'], ['action', 'grabber_arm_down'], ['action', 'grabber_arm_open'], ['action', 'slowly_forward'], ['action', 'grabber_arm_close'], ['action', 'slowly_backward'], ['action', 'grabber_arm_up']]
 #global_actions = [[],["action", "slowly_backward"]]
 #global_path_instructions = [['drive', 0.9], ['rotate', 90], ['drive', 44], ['rotate', 90]]
-#global_actions=[]
-#global_path_instructions = [ ['rotate', 90] ,['drive', 0.19], ['rotate', 90], ['rotate', 180], ['drive', 0.82], ['rotate', -45]]
- #['drive', 0.35], ['rotate', 90], ['drive', 0.22], ['drive', -0.22], ['drive', 0.22], ['drive', -0.22],['drive', 0.22], ['drive', -0.22], ['drive', 0.22], ['drive', -0.22], ['drive', 0.22], ['drive', -0.22]
-# #global_path_instructions=[
+global_actions=[]
+global_path_instructions = [['rotate', 90], ['drive', 0.19]]
+#, ['rotate', 90], ['rotate', 180], ['drive', 0.82],
+#['rotate', 45], ['drive', 0.35], ['rotate', 90], ['drive', 0.22], 
+#['drive', -0.22], ['drive', 0.22], ['drive', -0.22],
+#['drive', 0.22], ['drive', -0.22], ['drive', 0.22], ['drive', -0.22], 
+#['drive', 0.22], ['drive', -0.22]]
+#global_path_instructions=[]
+
 # robots current position
-#global_actions = [[], ['action', 'grabber_arm_close'],['action', 'holder_release'], ['action', 'slowly_backward'], ['action', 'holder_default'],['drive', 0.1], ['action', 'holder_release'], ['action', 'slowly_backward'], ['action', 'holder_default'], ['action', 'grabber_arm_close']]
-global_path_instructions = []#[['rotate', 90]]
-global_actions = [['drive', 0.19], ['rotate', 90], ['drive', 0.19], ['rotate', 90],['drive', 0.19], ['rotate', 90],['drive', 0.19], ['rotate', 90]]
 currentPosX, currentPosY = 18,10
 
 # PID set points
 set_point_left = 0.0
-set_point_right = 0.0 
+set_point_right = 0.0
 
 # PID controllers for the left and right motors
 leftPID = PID()
@@ -76,10 +74,6 @@ rightPID = PID()
 arm_controller_pub = rospy.Publisher("arm_controller", String, queue_size=10)
 holder_controller_pub = None # set it up in initialize_node function
 lcd_pub = None
-
-
-
-correct_speed = 7
 
 def start_stop_program(msg): # this will state the main state machine
     global state
@@ -91,70 +85,48 @@ def start_stop_program(msg): # this will state the main state machine
         rospy.loginfo("Stoping program...")
 
 
-def forward_correct():
-    global set_point_left, set_point_right, motor_controller, errorL, errorR, state, correct_speed
-    left_complete = False 
-    right_complete = False
-    #overshoot:
-    if errorL < 0: 
-        print("Left Overshoot") 
-        if motor_controller.get_left_distance() > errorL:
-            motor_controller.set_left_speed(128+correct_speed)
-        else:
-            motor_controller.set_acceleration(6)
-            motor_controller.set_left_speed(128)
-            left_complete = True
-
-    if errorR < 0: 
-        print("Right Overshoot")  
-        if motor_controller.get_right_distance() > errorR:
-            print("Right DIST={}".format(motor_controller.get_right_distance()))
-            motor_controller.set_right_speed(128+correct_speed)
-        else:
-            motor_controller.set_acceleration(6)
-            motor_controller.set_right_speed(128)
-            right_complete = True
-
-    #undershoot if forward, overshoot if backwards
-    if errorL > 0:
-        if motor_controller.get_left_distance() < errorL:
-            motor_controller.set_left_speed(128-correct_speed)
-        else:
-            motor_controller.set_acceleration(6)
-            motor_controller.set_right_speed(128)
-            left_complete = True
-
-    if errorR > 0:
-        print("error backward entered")
-        if abs(motor_controller.get_right_distance()) < abs(errorR):
-            motor_controller.set_right_speed(128-correct_speed)
-        else:
-            motor_controller.set_acceleration(6)
-            motor_controller.set_right_speed(128)
-            right_complete = True
-    
-    if left_complete and right_complete:
-        # errorOferrorleft = abs(motor_controller.get_left_distance() - errorL)
-        # errorOferrorRight = abs(motor_controller.get_right_distance() - errorR)
-        # if errorOferrorleft > 0.001 or errorOferrorRight > 0.001:
-        #     errorL = errorOferrorleft
-        #     errorR = errorOferrorRight
-        #     correct_speed = 4
-
-        #     motor_controller.resetEncoders()
-
-        state = States.STOP_MOTORS
-    # else:
-    #     print("errorOferrorleft={}, errorOferrorRight={}".format(errorOferrorleft, errorOferrorRight))
-    #     state = States.STOP_MOTORS
+def drive_forward(dist):
+    global state, motor_controller, leftPID, rightPID, left_wheel_movement_complete, right_wheel_movement_complete
+    motor_controller.resetEncoders()
+    print("DISTANCE = {}".format(dist))
+    set_point_left = dist / 100.0  # Set the left wheel PID, convert the distance to meters
+    set_point_right = dist / 100.0  # Set the left wheel PID, convert the distance to meters
+    leftPID.setPoint(set_point_left)  # Setting the left PID set point
+    rightPID.setPoint(set_point_right)  # Setting the right PID set point
+    left_wheel_movement_complete = False  # Reset the left wheel
+    right_wheel_movement_complete = False  # Reset the right wheel
+    print("SETPOINT LEFT= {}, SET_POINT_RIGHT={}, current={},{}".format(set_point_left,
+                                                                        set_point_right,
+                                                                        motor_controller.get_left_distance(),
+                                                                        motor_controller.get_right_distance()))
+    state = States.GO_TO_GOAL  # Now distances are set, let GO_TO_GOAL do the movements
 
 
+def turn_on_spot_left(angle):
+    global state, motor_controller, primary_robot
+    motor_controller.resetEncoders()
+    motor_controller.set_acceleration(4)
+    angle_in_rad = radians(angle)
+    distance_left = -1 * angle_in_rad * (primary_robot.axle_length / 2) # S = R * THETA
+    distance_right = angle_in_rad * (primary_robot.axle_length / 2)
+    motor_controller.set_left_speed(100)
+    motor_controller.set_right_speed(148)
+    time.sleep(0.74)
+    state = States.STOP_MOTORS
 
-def turn_left_correct():
-    pass
 
-def turn_right_correct():
-    pass
+def turn_on_spot_right(angle):
+    global state, motor_controller, primary_robot
+    motor_controller.resetEncoders()
+    angle_in_rad = radians(angle)
+    distance_left = -1 * angle_in_rad * (primary_robot.axle_length / 2) # S = R * THETA
+    distance_right = angle_in_rad * (primary_robot.axle_length / 2)
+    motor_controller.set_left_speed(148)
+    motor_controller.set_right_speed(100)
+    time.sleep(0.74)
+    state = States.STOP_MOTORS
+
+
 
 def turn(bearing):
     global state, motor_controller, leftPID, rightPID, left_wheel_movement_complete, right_wheel_movement_complete
@@ -173,7 +145,7 @@ def turn(bearing):
                                                                         motor_controller.get_left_distance(),
                                                                         motor_controller.get_right_distance()))
 def doAction(actionAsString): # find what action to do and talk to the node
-    global arm_controller_pub, state, arm_state, motor_controller, leftPID, rightPID, left_wheel_movement_complete, right_wheel_movement_complete, cylinders
+    global arm_controller_pub, state, arm_state, motor_controller, leftPID, rightPID, left_wheel_movement_complete, right_wheel_movement_complete
     global lcd_pub
     #rospy.loginfo("DO ACTION" + actionAsString)
     if actionAsString == "grabber_arm_up":
@@ -212,19 +184,10 @@ def doAction(actionAsString): # find what action to do and talk to the node
         #arm_state = ArmState.BUSY
         #state = States.WAITING_FOR_ACTION_FINISH
         pass
-    elif actionAsString == "holder_release":
-        arm_controller_pub.publish("holder_release")
-        arm_state = ArmState.BUSY
-        time.sleep(2)
-        state = States.WAITING_FOR_ACTION_FINISH
-        pass
-    elif actionAsString == "holder_default":
-        arm_controller_pub.publish("holder_default")
-        arm_state = ArmState.BUSY
-        time.sleep(2)
-        arm_controller_pub.publish("open_fully")
-        cylinders-=1
-        state = States.WAITING_FOR_ACTION_FINISH
+    elif actionAsString == "place_cylinder":
+        # Drop the cylinder into moonbase and move it forward
+        # Check cylinder can be placed and put in starting area if cannot
+        # todo(Boateng)
         pass
     elif actionAsString == "rotate_cylinder":
         # Check the light and rotate 1 cylinder until correct colour
@@ -242,21 +205,19 @@ def updatePos(data):
     print("Updated position to: ",position)
 
 def bump_detected(msg):
-    global state, cylinders
+    global state
     print(msg.data)
-    if msg.data == BumperType.GRABBER_BUMPER and cylinders!=4: # we hit a cylinder, grab it
+    if msg.data == BumperType.GRABBER_BUMPER: # we hit a cylinder, grab it
         state = States.STOP_MOTORS
-        cylinders+=1
         print("Bumb Detected")
-    elif msg.data == "moon_base_bump" and state ==States.SLOWLY_FORWARD: # we hit the moonbase bump
-        state = States.STOP_MOTORS
+    elif msg.data == "moon_base_bump": # we hit the moonbase bump
+        pass
     elif msg.data == BumperType.START_BUMPER: # Start main start_stop_program
         state = States.CHOOSE_TASK
 
-
 def initialize_node():
     global state, global_actions, arm_state, global_path_instructions, set_point_left, set_point_right, leftPID,\
-        rightPID, position, lcd_, arm_controller_pub, prev_state, errorL, errorR
+        rightPID, position, lcd_, arm_controller_pub, prev_state
     end_goal_position = []
     rospy.init_node("primary_robot_node") # Initialize the ros node
     rate = rospy.Rate(refresh_rate) # refresh rate
@@ -272,7 +233,8 @@ def initialize_node():
     # left and right wheel PID
     left_wheel_movement_complete = False # Whether the left wheel has moved the set distance
     right_wheel_movement_complete = False # Whether the right wheel has moved the set distance
-
+    errorL = 0
+    errorR = 0
     averagedError = 0
     while not rospy.is_shutdown():
         """
@@ -290,19 +252,15 @@ def initialize_node():
         elif state == States.CHOOSE_TASK:
             if not len(global_path_instructions) == 0: # We need to do some moving
                 move_action = global_path_instructions[0] # Get first movement command in the list
-                if move_action[0] == "drive" and move_action[1] > 0: # We have to drive straight forwards
+                if move_action[0] == "drive": # We have to drive straight forwards
                     print("DRIVINNG {} CM".format(move_action[1]))
                     set_point_left = move_action[1]
                     set_point_right = move_action[1]
                     #drive_forward(move_action[1])
                     state = States.DRIVE_FORWARD
-                    motor_controller.resetEncoders()
-                elif move_action[0] == "drive" and move_action[1] < 0:
-                    print("DRIVINNG {} CM".format(move_action[1]))
-                    set_point_left = move_action[1]
-                    set_point_right = move_action[1]
-                    state = States.DRIVE_BACKWARD
-                    motor_controller.resetEncoders()
+		elif move_action[0] == "action":
+		    action = move_action[1]
+		    doAction(action[1])
                 elif move_action[0] == "rotate": # We need  to turn some angle
                     motor_controller.resetEncoders()
                     set_point_left = (primary_robot.axle_length / 2.0) * radians(move_action[1])
@@ -310,7 +268,7 @@ def initialize_node():
                     print("MOVE STATE, LEFT={}, right={}".format(set_point_left, set_point_right))
                     state = States.TURN_LEFT
             else:
-                if not len(global_actions) < 2: # then are actions to do
+                if not len(global_actions) == 0: # then are actions to do
                     del global_actions[0] #delete previous action
                     rospy.loginfo("THERE ARE " + str(len(global_actions)) + " LEFT")
                     action  = global_actions[0] # Choose first TASK
@@ -319,56 +277,11 @@ def initialize_node():
                         end_goal_position = action[0:] # Set the end goal position ["moonbase", "yellow", "A"]
                         motor_controller.resetEncoders()
                         state = States.GO_TO_GOAL
-                    if action_type == "drive" and action[1] > 0: # We have to drive straight forwards
-                        print("DRIVINNG {} CM".format(action[1]))
-                        set_point_left = action[1]
-                        set_point_right = action[1]
-                        #drive_forward(move_action[1])
-                        state = States.DRIVE_FORWARD
-                        motor_controller.resetEncoders()
-                    elif action_type == "drive" and action[1] < 0:
-                        print("DRIVINNG {} CM".format(action[1]))
-                        set_point_left = action[1]
-                        set_point_right = action[1]
-                        state = States.DRIVE_BACKWARD
-                        motor_controller.resetEncoders()
-                    elif action_type == "rotate": # We need  to turn some angle
-                        motor_controller.resetEncoders()
-                        set_point_left = (primary_robot.axle_length / 2.0) * radians(action[1])
-                        set_point_right = -1 * (primary_robot.axle_length / 2.0) * radians(action[1])
-                        print("MOVE STATE, LEFT={}, right={}".format(set_point_left, set_point_right))
-                        state = States.TURN_LEFT
                     elif action_type == ActionTypes.ACTION: # We need to do action such as open grabber
                         doAction(action[1])
-                    else:
-                        pass
-                        #print("no instructions to do")
-
-        #this code was at the same level as state machine and move_action is defined inside global_path_instruction branch, so I commented it out
-        # if move_action[0] == "action":
-        #     action = move_action[1]
-        #     doAction(action[1])
-        #     if move_action[0] == "rotate": # We need  to turn some angle
-        #             motor_controller.resetEncoders()
-        #             set_point_left = (primary_robot.axle_length / 2.0) * radians(move_action[1])
-        #             set_point_right = -1 * (primary_robot.axle_length / 2.0) * radians(move_action[1])
-        #             print("MOVE STATE, LEFT={}, right={}".format(set_point_left, set_point_right))
-        #             state = States.TURN_LEFT
-        #     else:
-        #         if not len(global_actions) < 2: # then are actions to do
-        #             del global_actions[0] #delete previous action
-        #             rospy.loginfo("THERE ARE " + str(len(global_actions)) + " LEFT")
-        #             action  = global_actions[0] # Choose first TASK
-        #             action_type = action[0]
-        #             if action_type == ActionTypes.GO_TO: # We need to move somewhere
-        #                 end_goal_position = action[0:] # Set the end goal position ["moonbase", "yellow", "A"]
-        #                 motor_controller.resetEncoders()
-        #                 state = States.GO_TO_GOAL
-        #             elif action_type == ActionTypes.ACTION: # We need to do action such as open grabber
-        #                 doAction(action[1])
-        #         else:
-        #             pass
-        #             #print("no instructions to do")
+                else:
+                    pass
+                    #print("no instructions to do")
         elif state == States.GET_PATH: # return path using A* or pre coded route
             print("State = GET PATH")
             global_path_instructions = my_map.get_instructions(position, end_goal_position) # Get the path
@@ -400,116 +313,69 @@ def initialize_node():
 
             if left_wheel_movement_complete and right_wheel_movement_complete:
                 state = States.STOP_MOTORS
-        elif state == States.DRIVE_FORWARD:
-
-            if motor_controller.get_left_distance() < set_point_left:
-
-                motor_controller.set_acceleration(5)
-                motor_controller.set_left_speed(100)
-                motor_controller.set_right_speed(100)
-
-            else:
-                motor_controller.set_acceleration(8)
-                motor_controller.stop()
-                time.sleep(0.3)
-                print("actualLEFT = {}, actualright={}, set_point_left={}".format(motor_controller.get_left_distance(), motor_controller.get_right_distance(), set_point_left))
-                averagedDistance = (motor_controller.get_left_distance() + motor_controller.get_right_distance()) / 2
-                averagedError = averagedDistance - set_point_left
-                errorR = set_point_right -  motor_controller.get_right_distance()
-                errorL = set_point_left - motor_controller.get_left_distance()
-                # print("averagederror={}".format(averagedError))
-                motor_controller.set_acceleration(1)
-                motor_controller.resetEncoders()
-                state = States.ERROR_CORRECT
-
-        elif state == States.DRIVE_BACKWARD:
-            if motor_controller.get_left_distance() > set_point_left:
-                    motor_controller.set_acceleration(5)
-                    motor_controller.set_left_speed(148)
-                    motor_controller.set_right_speed(148)
+        elif state =[['rotate', 90], ['drive', 0.19], ['rotate', 90], ['rotate', 180], ['drive', 0.82],
+['rotate', 45], ['drive', 0.35], ['rotate', 90], ['drive', 0.22], 
+['drive', -0.22], ['drive', 0.22], ['drive', -0.22],
+['drive' 0.22], ['drive', -0.22], ['drive', 0.22], ['drive', -0.22], 
+['drive', 0.22], ['drive', -0.22]]= States.DRIVE_FORWARD:
+            if (motor_controller.get_left_distance() + motor_controller.get_right_distance()) / 2 < set_point_left-0.2:
+                    motor_controller.set_left_speed(80)
+                    motor_controller.set_right_speed(80)
 
             else:
                 motor_controller.set_acceleration(7)
                 motor_controller.stop()
                 time.sleep(0.3)
                 print("actualLEFT = {}, actualright={}, set_point_left={}".format(motor_controller.get_left_distance(), motor_controller.get_right_distance(), set_point_left))
-                # averagedDistance = (motor_controller.get_left_distance() + motor_controller.get_right_distance()) / 2
-                # averagedError = averagedDistance - set_point_left
-                errorR = set_point_right -  motor_controller.get_right_distance()
-                errorL = set_point_left - motor_controller.get_left_distance()
-                # print("averagederror={}".format(averagedError))
-                motor_controller.set_acceleration(1)
+                averagedDistance = (motor_controller.get_left_distance() + motor_controller.get_right_distance()) / 2
+                averagedError = averagedDistance - set_point_left
+                print("averagederror={}".format(averagedError))
                 motor_controller.resetEncoders()
                 state = States.ERROR_CORRECT
 
 
         elif state ==  States.TURN_LEFT:
             if motor_controller.get_left_distance() < set_point_left:
-                    motor_controller.set_acceleration(5)
-                    motor_controller.set_left_speed(110)
-                    motor_controller.set_right_speed(146)
+                    motor_controller.set_left_speed(100)
+                    motor_controller.set_right_speed(156)
             else:
                 motor_controller.set_acceleration(7)
                 motor_controller.stop()
                 time.sleep(0.3)
                 print("LEFT={}, right={},actualLeft={}. actualRight={}".format(set_point_left, set_point_right, motor_controller.get_left_distance(), motor_controller.get_right_distance()))
-                # errorR = motor_controller.get_right_distance() - set_point_right
-                # errorL = motor_controller.get_left_distance() - set_point_left
-
-                errorR = set_point_right -  motor_controller.get_right_distance()
-                errorL = set_point_left - motor_controller.get_left_distance()
-
+                errorR = motor_controller.get_right_distance() - set_point_right
+                errorL = motor_controller.get_left_distance() - set_point_left
                 print("LEFT DIST={}, errorL={}".format(motor_controller.get_left_distance(), errorL))
                 motor_controller.resetEncoders()
-                time.sleep(0.2)
-                motor_controller.set_acceleration(1)
                 state = States.ERROR_CORRECT
 
         elif state == States.ERROR_CORRECT:
-            forward_correct()
-            # print("ERROR CORRRECRT ENTER")
-            # if (errorL > 0):
-            #     print("ERROR CORRECT, LEFT DIST={}".format(motor_controller.get_left_distance()))
-            #     if -(motor_controller.get_left_distance()) < errorL:
-            #         motor_controller.set_acceleration(2)
-            #         motor_controller.set_left_speed(138)
-            #         motor_controller.set_right_speed(118)
-            #         print("distanceaftercorrection={}, initialerror={}".format(-(motor_controller.get_left_distance()), errorL))
-            #     else:
-            #         state = States.STOP_MOTORS
-            #         errorL = 0
+            print("ERROR CORRRECRT ENTER")
+            if (errorL > 0):
+                print("ERROR CORRECT, LEFT DIST={}".format(motor_controller.get_left_distance()))
+                if -(motor_controller.get_left_distance()) < errorL:
+                    motor_controller.set_left_speed(138)
+                    motor_controller.set_right_speed(118)
+                    print("distanceaftercorrection={}, initialerror={}".format(-(motor_controller.get_left_distance()), errorL))
+                else:
+                    state = States.STOP_MOTORS
 
-            # if (errorL < 0):
-            #     print("undershoot, left_distance={}".format(motor_controller.get_left_distance()))
-            #     if abs(motor_controller.get_left_distance()) < abs(errorL):
-            #         print("go forwards")
-            #         motor_controller.set_left_speed(120)
-            #         motor_controller.set_right_speed(140)
-            #     else:
-            #         state=States.STOP_MOTORS
-            #         errorL = 0
+            if (averagedError > 0):
+                print("averagedError={}".format(averagedError))
+                if -(motor_controller.get_left_distance()) < averagedError:
+                    motor_controller.set_left_speed(140)
+                    motor_controller.set_right_speed(140)
+                else:
+                    state= States.STOP_MOTORS
 
-            # if (averagedError > 0):
-            #     print("averagedError={}".format(averagedError))
-            #     if -(motor_controller.get_left_distance()) < averagedError:
-            #         motor_controller.set_left_speed(140)
-            #         motor_controller.set_right_speed(140)
-
-            #     else:
-            #         state= States.STOP_MOTORS
-            #         averagedError = 0
-
-            # if (averagedError < 0):
-            #     print("averageCorrect")
-            #     if abs(motor_controller.get_left_distance()) <  abs(averagedError):
-            #         print("go back")
-            #         motor_controller.set_left_speed(120)
-            #         motor_controller.set_right_speed(120)
-            #     else:
-            #         state= States.STOP_MOTORS
-            #         averagedError = 0
-
-
+            if (averagedError < 0):
+                print("averageCorrect")
+                if abs(motor_controller.get_left_distance()) <  abs(averagedError):
+                    print("go back")
+                    motor_controller.set_left_speed(120)
+                    motor_controller.set_right_speed(120)
+                else:
+                    state= States.STOP_MOTORS
 
         elif state == States.TURN_RIGHT:
             if motor_controller.get_left_distance() > set_point_left:
@@ -520,7 +386,6 @@ def initialize_node():
                  state = States.ERROR_CORRECT
 
         elif state == States.STOP_MOTORS:  # stop the motors
-            motor_controller.set_acceleration(8)
             motor_controller.stop()
             time.sleep(0.3)
             print("STOP MOTOR ")
