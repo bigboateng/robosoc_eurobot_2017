@@ -61,7 +61,7 @@ my_map, array = None, None#my_map_loader.load_map(0)
 # robots current position
 #global_actions = [[], ['action', 'grabber_arm_close'],['action', 'holder_release'], ['action', 'slowly_backward'], ['action', 'holder_default'],['drive', 0.1], ['action', 'holder_release'], ['action', 'slowly_backward'], ['action', 'holder_default'], ['action', 'grabber_arm_close']]
 global_path_instructions = []#[['rotate', 90]]
-global_actions = [['drive', 0.19], ['rotate', 90], ['drive', 0.19], ['rotate', 90],['drive', 0.19], ['rotate', 90],['drive', 0.19], ['rotate', 90]]
+global_actions = [[], ['drive', 0.19], ['rotate', 90],['drive', 0.19], ['rotate', 90],['drive', 0.19], ['rotate', 90]]
 currentPosX, currentPosY = 18,10
 
 # PID set points
@@ -404,32 +404,34 @@ def initialize_node():
 
             if motor_controller.get_left_distance() < set_point_left:
 
-                motor_controller.set_acceleration(5)
+                motor_controller.set_acceleration(2)
                 motor_controller.set_left_speed(100)
                 motor_controller.set_right_speed(100)
 
             else:
-                motor_controller.set_acceleration(8)
+                
+                #leftBefore, rightBefore = motor_controller.get_left_distance(), motor_controller.get_right_distance()
                 motor_controller.stop()
+                motor_controller.set_acceleration(8)
                 time.sleep(0.3)
-                print("actualLEFT = {}, actualright={}, set_point_left={}".format(motor_controller.get_left_distance(), motor_controller.get_right_distance(), set_point_left))
-                averagedDistance = (motor_controller.get_left_distance() + motor_controller.get_right_distance()) / 2
-                averagedError = averagedDistance - set_point_left
+                #print("leftStopDistance= {}, rightStopSitance={}".format(motor_controller.get_left_distance()-leftBefore, motor_controller.get_right_distance()-rightBefore))
                 errorR = set_point_right -  motor_controller.get_right_distance()
                 errorL = set_point_left - motor_controller.get_left_distance()
-                # print("averagederror={}".format(averagedError))
+
+
                 motor_controller.set_acceleration(1)
                 motor_controller.resetEncoders()
+                #state = States.STOP_MOTORS
                 state = States.ERROR_CORRECT
 
         elif state == States.DRIVE_BACKWARD:
             if motor_controller.get_left_distance() > set_point_left:
-                    motor_controller.set_acceleration(5)
+                    motor_controller.set_acceleration(2)
                     motor_controller.set_left_speed(148)
                     motor_controller.set_right_speed(148)
 
             else:
-                motor_controller.set_acceleration(7)
+                motor_controller.set_acceleration(8)
                 motor_controller.stop()
                 time.sleep(0.3)
                 print("actualLEFT = {}, actualright={}, set_point_left={}".format(motor_controller.get_left_distance(), motor_controller.get_right_distance(), set_point_left))
@@ -444,12 +446,13 @@ def initialize_node():
 
 
         elif state ==  States.TURN_LEFT:
+            print("Set point left={}, left_distance={}".format(set_point_left, motor_controller.get_left_distance()))
             if motor_controller.get_left_distance() < set_point_left:
                     motor_controller.set_acceleration(5)
                     motor_controller.set_left_speed(110)
                     motor_controller.set_right_speed(146)
             else:
-                motor_controller.set_acceleration(7)
+                motor_controller.set_acceleration(8)
                 motor_controller.stop()
                 time.sleep(0.3)
                 print("LEFT={}, right={},actualLeft={}. actualRight={}".format(set_point_left, set_point_right, motor_controller.get_left_distance(), motor_controller.get_right_distance()))
@@ -461,7 +464,6 @@ def initialize_node():
 
                 print("LEFT DIST={}, errorL={}".format(motor_controller.get_left_distance(), errorL))
                 motor_controller.resetEncoders()
-                time.sleep(0.2)
                 motor_controller.set_acceleration(1)
                 state = States.ERROR_CORRECT
 
