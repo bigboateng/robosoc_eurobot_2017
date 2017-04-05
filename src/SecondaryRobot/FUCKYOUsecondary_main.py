@@ -59,29 +59,10 @@ my_map, array = None, None#my_map_loader.load_map(0)
  #['drive', 0.35], ['rotate', 90], ['drive', 0.22], ['drive', -0.22], ['drive', 0.22], ['drive', -0.22],['drive', 0.22], ['drive', -0.22], ['drive', 0.22], ['drive', -0.22], ['drive', 0.22], ['drive', -0.22]
 # #global_path_instructions=[
 # robots current position
-#global_actions = [[], ['action', 'grabber_arm_close'],['action', 'holder_release'], ['action', 'slowly_backward'], ['action', 'holder_default'],['drive', 0.1], ['action', 'holder_release'], ['action', 'slowly_backward'], ['action', 'holder_default'], ['action', 'grabber_arm_close']]
-global_path_instructions = []#[['rotate', 90]]
-global_actions = [[], ['action', 'grabber_arm_close'], ['action', 'grabber_arm_down'], 
-['action', 'grabber_arm_open'], ['action', 'grabber_arm_close'], 
-['action', 'grabber_arm_up'], ['action', 'grabber_arm_open_fully']]
-#['action', 'grabber_arm_up'], ['drive', 0.44],['drive', -0.16], 
-#['rotate', -90], ['drive', -0.15], ['action', 'grabber_arm_down'], 
-#['action', 'grabber_arm_open'], ['drive', 1], ['action', 'grabber_arm_close'], 
-#['drive', -0.35], ['action', 'grabber_arm_up'], ['action', 'grabber_arm_open_fully'], 
-#['action', 'grabber_arm_down'], ['action', 'grabber_arm_open'], ['drive', 1], ['action', 'grabber_arm_close'], 
-#['drive', -0.35], ['action', 'grabber_arm_up'], ['action', 'grabber_arm_open_fully'], 
-#['action', 'grabber_arm_down'], 
-#['action', 'grabber_arm_open'], ['drive', 1], ['action', 'grabber_arm_close'], 
-#['drive', -0.35], ['action', 'grabber_arm_up'], ['action', 'grabber_arm_open_fully'], 
-#['action', 'grabber_arm_down'], 
-#['action', 'grabber_arm_open'], ['drive', 1], ['action', 'grabber_arm_close'], 
-#['drive', -0.35], ['action', 'grabber_arm_up'], ['rotate', 90], ['drive', 0.16], ['rotate', 135],
-#['drive', 0.92], ['rotate', -90], ['drive', 0.59],
-#['action', 'drop_cylinder'], ['drive', 0.22], 
-#['drive', -0.22], ['action', 'drop_cylinder'], ['drive', 0.22], ['drive', -0.22], ['action', 'drop_cylinder'], 
-#['drive', 0.22], ['drive', -0.22], ['action', 'drop_cylinder'], ['drive', 0.22], ['drive', -0.22], 
-#['action', 'drop_cylinder'], ['drive', 0.22], ['drive', -0.22]]
-#global_actions =[['rotate', -11.888658039627956], ['drive', 0.194164878389476], ['rotate', 101.88865803962796]]
+global_actions = [[], ['action', 'grabber_arm_close'],['action', 'holder_release'], ['action', 'slowly_backward'], ['action', 'holder_default'],['drive', 0.1], ['action', 'holder_release'], ['action', 'slowly_backward'], ['action', 'holder_default'], ['action', 'grabber_arm_close']]
+global_path_instructions = []
+#global_path_instructions = []#[['rotate', 90]]
+#global_actions = [[], ['drive', 0.19], ['rotate', 90],['drive', 0.19], ['rotate', 90],['drive', 0.19], ['rotate', 90]]
 currentPosX, currentPosY = 18,10
 
 # PID set points
@@ -264,9 +245,9 @@ def updatePos(data):
 def bump_detected(msg):
     global state, cylinders
     print(msg.data)
-    if msg.data == BumperType.GRABBER_BUMPER: #and cylinders!=4: # we hit a cylinder, grab it
+    if msg.data == BumperType.GRABBER_BUMPER and cylinders!=4: # we hit a cylinder, grab it
         state = States.STOP_MOTORS
-        #cylinders+=1
+        cylinders+=1
         print("Bumb Detected")
     elif msg.data == "moon_base_bump" and state ==States.SLOWLY_FORWARD: # we hit the moonbase bump
         state = States.STOP_MOTORS
@@ -554,10 +535,8 @@ def initialize_node():
             # Set a small distance at which to travel slowly for grabbing cylinder
             state = States.GO_TO_GOAL_SLOWLY
         elif state == States.GO_TO_GOAL_SLOWLY: # Go to goal at a slow speed
-                # motor_controller.set_left_speed(120)
-                # motor_controller.set_right_speed(120)
-                set_point_left = 0.2
-                set_point_rig
+                motor_controller.set_left_speed(120)
+                motor_controller.set_right_speed(120)
         elif state == States.EMERGENCY_STOP:
             motor_controller.stop()
         rate.sleep()

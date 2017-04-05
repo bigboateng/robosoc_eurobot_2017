@@ -214,11 +214,21 @@ class Map(object):
 
         return path_in_context, generalised, boundaries
 
+    def angleF(self, a, b):
+        total = float(a)-b
+        if(abs(total)>180):
+            if total>0:
+                total = total -360
+            else:
+                total = total +360
+        return total
+
     #uses get path and then corvets it into instructions
     def get_instructions(self, source, destination):
         path_in_context, points, boundaries = self.get_path([source[0],source[1]], [destination[0],destination[1]])
-	    instructions = []
-        currentAngle = source[3]
+	instructions = []
+        currentAngle = source[2]
+        lastAngle = source[2]
         for p in range(1, len(points)):
     	    x0 = points[p-1][0]
     	    x1 = points[p][0]
@@ -227,12 +237,12 @@ class Map(object):
     	    xDiff = x1 - x0
             yDiff = y1 - y0
             newAngle = degrees(atan2(yDiff, xDiff)) + 90
-            angle = newAngle-lastAngle
+            angle = self.angleF(newAngle, lastAngle)
             lastAngle = newAngle
             distance = sqrt((x1 - x0)**2 + (y1 - y0)**2)
             instructions.append(["rotate", angle])
             instructions.append(["drive",distance])
-	instructions.append(["drive", finalAngle-lastAngle])
+	instructions.append(["rotate", self.angleF(destination[2], lastAngle)])
 	return instructions
 
     # add obstacles of set radius to the map, 
