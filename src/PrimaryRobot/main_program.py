@@ -47,8 +47,11 @@ set_point_right = 0.0
 leftPID = PID()
 rightPID = PID()
 
-# publishers
-arm_controller_pub = None # set it up in initialize_node function
+def start_collecting():
+
+
+def stop_collecting():
+
 def start_stop_program(msg): # this will state the main state machine
     global state
     if msg.data == "start":
@@ -60,7 +63,7 @@ def start_stop_program(msg): # this will state the main state machine
 
 def doAction(actionAsString): # find what action to do and publish
     global arm_controller_pub, state, arm_state
-    if actionAsString == "armUp":
+    if actionAsString == "":
         arm_controller_pub.pub("up")
         state = States.WAITING_FOR_ACTION_FINISH
         arm_state = ArmState.BUSY

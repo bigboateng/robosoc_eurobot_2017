@@ -10,6 +10,11 @@ from PrimaryRobotState import BumperType
 
 refresh_rate = 10 # 10 times a second
 
+bumper_pub = None
+
+def my_callback(event):
+    print 'End Timer called at ' + str(event.current_real)
+    bumper_pub.publish("end")
 
 def init_node():
 	global refresh_rate
@@ -19,7 +24,7 @@ def init_node():
 	pins = [17,27]
 	grabber_bumber = Bumper([22], "PULL_DOWN")
 	moon_base_bumper = Bumper(pins, "PULL_DOWN")
-	start_button_bumber = Bumper([4], "PULL_UP")
+	start_button_bumber = Bumper([13], "PULL_UP")
 	# publisher to alert when bumper is pressed
 	bumper_pub = rospy.Publisher("bumper_topic", String, queue_size=10)
 	rospy.loginfo("Beginning node")
@@ -32,9 +37,8 @@ def init_node():
 			rospy.loginfo("BOTTOM PRESSED")
 			bumper_pub.publish(BumperType.MOON_BASE_BUMPER)
 
-		# if start_button_bumber.isPressed():
-		# 	pass
-		# 	bumper_pub.publish(BumperType.START_BUMPER)
+		if start_button_bumber.isPressed():
+		 	bumper_pub.publish(BumperType.START_BUMPER)
 		rate.sleep()
 
 

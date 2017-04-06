@@ -36,20 +36,20 @@ def send_action_complete():
 def grabberOpen():
     print "Open (10 deg.)"
     grabber_servo.setAngle(0)
-    time.sleep(2.0)
+    rospy.sleep(2.0)
     send_action_complete()
 
 def grabberOpenFully():
     print "Open grabber (-90 deg.)"
     grabber_servo.setAngle(-90)
-    time.sleep(2.0)
+    rospy.sleep(2.0)
     send_action_complete()
 
 def grabberClose():
     rospy.loginfo("close arm here")
     print "Close grabber (40 deg.)"
     grabber_servo.setAngle(70)
-    time.sleep(2.0)
+    rospy.sleep(2.0)
     send_action_complete()
     #grabber_servo.setAngle(0) # stop giving current
 
@@ -58,39 +58,39 @@ def armUp():
     rospy.loginfo("go up with arm here")
     #grabberClose()
     grabber_servo.setAngle(70)
-    time.sleep(1.9)
+    rospy.sleep(1.9)
 
     arm_servo.setAngle(54)
-    time.sleep(1.9)
+    rospy.sleep(1.9)
     send_action_complete()
 
 def armDown():
     rospy.loginfo("go down with arm here")
     #grabberClose()
     grabber_servo.setAngle(70)
-    time.sleep(3)
+    rospy.sleep(3)
 
     arm_servo.setAngle(-88+33)
-    time.sleep(3)
+    rospy.sleep(3)
     send_action_complete()
 
 def defaultPosition():
     armUp()
     grabber_servo.setAngle(0)
-    time.sleep(1.5)
+    rospy.sleep(1.5)
     send_action_complete()
 
 #TODO finish holder functions with actual python code
 def holderRelease():
     print "Angle: 35 deg."
     servo_cyl.setAngle(15)
-    time.sleep(0.4)
+    rospy.sleep(0.4)
     send_action_complete()
 
 def holderDefault():
     print "Angle: 90 deg."
     servo_cyl.setAngle(90)
-    time.sleep(0.4)
+    rospy.sleep(0.4)
     send_action_complete()
 
 

@@ -221,7 +221,7 @@ class Map(object):
                 total = total -360
             else:
                 total = total +360
-        return total
+        return -total
 
     #uses get path and then corvets it into instructions
     def get_instructions(self, source, destination):

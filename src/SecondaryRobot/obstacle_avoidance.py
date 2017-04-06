@@ -38,11 +38,14 @@ def initialize_node():
     alert_message = ""
     while not rospy.is_shutdown():
         IR_sensor_back.getAnalogValue()
+        US_sensor_front.readEcho()
+        print("IR sensor: "+str(IR_sensor_back.distance))
+        print("UT sensor: "+str(US_sensor_front.echo[0])
         if IR_sensor_back.distance > ir_threshold:
-            alert_message = "front"
+            alert_message = "back"+str(IR_sensor_back.distance)
             obstacle_alert.publish(alert_message)
-        if sensor_back.US_sensor_front() > ut_threshold:
-            alert_message = "back"
+        if US_sensor_front.echo[0] < ut_threshold:
+            alert_message = "front"+str(US_sensor_front.echo[0])
             obstacle_alert.publish(alert_message)
         rate.sleep()
 

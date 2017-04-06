@@ -111,7 +111,7 @@ def turn_on_spot_left(angle):
     distance_right = angle_in_rad * (primary_robot.axle_length / 2)
     motor_controller.set_left_speed(100)
     motor_controller.set_right_speed(148)
-    time.sleep(0.74)
+    rospy.sleep(0.74)
     state = States.STOP_MOTORS
 
 
@@ -123,7 +123,7 @@ def turn_on_spot_right(angle):
     distance_right = angle_in_rad * (primary_robot.axle_length / 2)
     motor_controller.set_left_speed(148)
     motor_controller.set_right_speed(100)
-    time.sleep(0.74)
+    rospy.sleep(0.74)
     state = States.STOP_MOTORS
 
 
@@ -176,7 +176,7 @@ def doAction(actionAsString): # find what action to do and talk to the node
         motor_controller.resetEncoders()
         motor_controller.set_left_speed(145)
         motor_controller.set_right_speed(145)
-        time.sleep(2)
+        rospy.sleep(2)
         #drive_forward(-300)
         state = States.CHOOSE_TASK
     elif actionAsString == "grabber_arm_default":
@@ -214,6 +214,8 @@ def bump_detected(msg):
         pass
     elif msg.data == BumperType.START_BUMPER: # Start main start_stop_program
         state = States.CHOOSE_TASK
+    elif msg.data == "end": # Start main start_stop_program
+        state = States.EMERGENCY_STOP
 
 def initialize_node():
     global state, global_actions, arm_state, global_path_instructions, set_point_left, set_point_right, leftPID,\
@@ -325,7 +327,7 @@ def initialize_node():
             else:
                 motor_controller.set_acceleration(7)
                 motor_controller.stop()
-                time.sleep(0.3)
+                rospy.sleep(0.3)
                 print("actualLEFT = {}, actualright={}, set_point_left={}".format(motor_controller.get_left_distance(), motor_controller.get_right_distance(), set_point_left))
                 averagedDistance = (motor_controller.get_left_distance() + motor_controller.get_right_distance()) / 2
                 averagedError = averagedDistance - set_point_left
@@ -341,7 +343,7 @@ def initialize_node():
             else:
                 motor_controller.set_acceleration(7)
                 motor_controller.stop()
-                time.sleep(0.3)
+                rospy.sleep(0.3)
                 print("LEFT={}, right={},actualLeft={}. actualRight={}".format(set_point_left, set_point_right, motor_controller.get_left_distance(), motor_controller.get_right_distance()))
                 errorR = motor_controller.get_right_distance() - set_point_right
                 errorL = motor_controller.get_left_distance() - set_point_left
@@ -387,7 +389,7 @@ def initialize_node():
 
         elif state == States.STOP_MOTORS:  # stop the motors
             motor_controller.stop()
-            time.sleep(0.3)
+            rospy.sleep(0.3)
             print("STOP MOTOR ")
             if len(global_path_instructions):
                 del global_path_instructions[0]

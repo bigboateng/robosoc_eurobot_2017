@@ -8,6 +8,10 @@ GPIO.setmode(GPIO.BCM)
 # GPIO 23 set up as input. It is pulled up to stop false signals  
 GPIO.setup(17, GPIO.IN, pull_up_down=GPIO.PUD_UP)  
 
+def my_callback(event):
+    print 'Timer called at ' + str(event.current_real)
+    pub.publish("end")
+
 def talker():
     pub = rospy.Publisher('startButton', String, queue_size=10)
     rospy.init_node('start_button_node', anonymous=True)
@@ -22,6 +26,7 @@ def talker():
             GPIO.cleanup()
         rospy.loginfo(hello_str)
         pub.publish(hello_str)
+        rospy.Timer(rospy.Duration(90), my_callback)
         rate.sleep()
 
 if __name__ == '__main__':
